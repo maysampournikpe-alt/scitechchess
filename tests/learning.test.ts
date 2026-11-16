@@ -162,3 +162,18 @@ describe("diagnostic report", () => {
     expect(recurringMisses(attempts, T0)[0].concept).toBe("theme:defensiveMove");
   });
 });
+
+import { weekStart, weeklyStats } from "@/lib/learning/stats";
+describe("weekly stats", () => {
+  it("buckets by week, counts empty weeks, and measures accuracy on first-time attempts only", () => {
+    const now = new Date(2026, 0, 14, 12).getTime(); // a Wednesday
+    const mon = weekStart(now);
+    expect(new Date(mon).getDay()).toBe(1);
+    const list = [att({ t: mon + 1000 }), att({ t: mon + 2000, outcome: "failed" }), att({ t: mon + 3000, firstSeen: false }), att({ t: mon - 3 * DAY })];
+    const w = weeklyStats(list, now, 4);
+    expect(w).toHaveLength(4);
+    expect(w[3]).toMatchObject({ attempts: 3, firstTime: 2, firstTimeSolo: 1 });
+    expect(w[2].attempts).toBe(1);
+    expect(w[0].attempts).toBe(0);
+  });
+});

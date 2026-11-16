@@ -31,7 +31,7 @@ function Trainer() {
     const s = useStore.getState();
     const score = s.skills[skillId].score;
     // Warm-up puzzles sit clearly below the learner's level; adaptive ones at it.
-    const target = mode === "warmup" ? score - 250 : score;
+    const target = mode === "warmup" ? score - 250 : mode === "hard" ? score + 200 : score;
     const exclude = new Set(Object.keys(s.seen).filter((k) => k.startsWith("puzzle:")).map((k) => k.slice(7)));
     setPuzzle(pickPuzzle(all, { target, theme: theme || undefined, exclude }));
   }, [all, theme, mode, skillId]);

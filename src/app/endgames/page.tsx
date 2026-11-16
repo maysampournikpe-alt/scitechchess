@@ -2,53 +2,14 @@
 import Link from "next/link";
 import { Suspense, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { Chess } from "chess.js";
 import { Board } from "@/components/Board";
 import { EndgamePractice } from "@/components/EndgamePractice";
-import { Feedback, PageHeader, Ready } from "@/components/ui";
+import { EndgameFind } from "@/components/EndgameFind";
+import { PageHeader, Ready } from "@/components/ui";
 import { ENDGAMES, ENDGAME_BY_ID, type Endgame } from "@/content/endgames";
-import { applyUci } from "@/lib/chess/rules";
 import { mastery, MASTERY_LABEL } from "@/lib/learning/mastery";
 import { useStore } from "@/lib/store/store";
 import { useNow } from "@/lib/store/derived";
-
-function FindTheMove({ endgame }: { endgame: Endgame }) {
-  const record = useStore((s) => s.record);
-  const [answer, setAnswer] = useState<{ san: string; right: boolean } | null>(null);
-  const [rev, setRev] = useState(0);
-  const [start] = useState(() => Date.now());
-
-  function onMove(uci: string) {
-    if (answer) return;
-    const c = new Chess(endgame.fen);
-    const m = applyUci(c, uci);
-    if (!m) return;
-    const right = endgame.keyMoves.includes(m.san);
-    setAnswer({ san: m.san, right });
-    setRev((r) => r + 1);
-    record({ itemId: `endgame-q:${endgame.id}`, module: "endgame", skill: "endgameKnowledge", concept: `endgame:${endgame.id}`, difficulty: endgame.difficulty, itemRd: 200, outcome: right ? "solo" : "failed", hints: 0, ms: Date.now() - start, card: { label: endgame.name, href: `/endgames/?id=${endgame.id}`, kind: "endgame" } });
-  }
-
-  return (
-    <div className="grid gap-6 md:grid-cols-[minmax(0,32rem)_1fr]">
-      <Board fen={endgame.fen} orientation={endgame.side} movable={answer ? null : endgame.side} onMove={onMove} resetKey={rev} label="Find the move" />
-      <div className="flex flex-col gap-4">
-        <div>
-          <h3 className="text-xl">Find the move</h3>
-          <p className="mt-1 text-muted">
-            {endgame.side === "w" ? "White" : "Black"} to move. Play the move that {endgame.goal === "win" ? "keeps the win" : "holds the draw"}. You get one try.
-          </p>
-        </div>
-        {answer && (
-          <Feedback tone={answer.right ? "good" : "bad"}>
-            <p className="font-semibold">{answer.right ? `${answer.san} is correct.` : `${answer.san} is not it. The move is ${endgame.keyMoves.join(" or ")}.`}</p>
-            <p className="mt-1">{endgame.why}</p>
-          </Feedback>
-        )}
-      </div>
-    </div>
-  );
-}
 
 function Lesson({ endgame }: { endgame: Endgame }) {
   const introduce = useStore((s) => s.introduce);
@@ -100,7 +61,7 @@ function Lesson({ endgame }: { endgame: Endgame }) {
           </div>
         </div>
       )}
-      {tab === "find" && <FindTheMove endgame={endgame} />}
+      {tab === "find" && <EndgameFind endgame={endgame} />}
       {tab === "play" && <EndgamePractice endgame={endgame} />}
     </>
   );

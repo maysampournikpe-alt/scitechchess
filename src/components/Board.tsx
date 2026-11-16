@@ -138,7 +138,7 @@ export function Board({ fen, orientation = "w", movable = null, onMove, lastMove
 
   return (
     <div className="w-full">
-      <div className="board-frame">
+      <div className="board-frame" data-fen={fen}>
         <div ref={el} role="img" aria-label={`${label}. ${hidePieces ? "Pieces are hidden for this exercise." : describePosition(chess)}`} />
         {promo && (
           <div role="dialog" aria-modal="true" aria-label="Choose a piece to promote to" className="absolute inset-0 z-10 grid place-items-center bg-black/60">

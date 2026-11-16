@@ -100,3 +100,37 @@ export function solutionSan(puzzle: Puzzle): string[] {
   });
   return out;
 }
+
+export type CalcResult = { correct: number; total: number; error: string | null };
+
+/**
+ * Calculation mode: the solver writes all of their moves (SAN or UCI, separated by spaces or
+ * commas, move numbers allowed) before touching the board. The opponent's replies come from the
+ * puzzle. `correct` counts solver moves that matched before the first error.
+ */
+export function checkCalculation(puzzle: Puzzle, text: string): CalcResult {
+  const tokens = text
+    .replace(/\d+\.(\.\.)?/g, " ")
+    .split(/[\s,]+/)
+    .filter(Boolean);
+  const run = new PuzzleRun(puzzle);
+  const total = Math.ceil((puzzle.moves.length - 1) / 2);
+  let correct = 0;
+  for (const tok of tokens) {
+    if (run.done) break;
+    const probe = new Chess(run.fen);
+    const m = (() => {
+      try {
+        return probe.move(/^[a-h][1-8][a-h][1-8][qrbn]?$/i.test(tok) ? { from: tok.slice(0, 2), to: tok.slice(2, 4), promotion: tok[4] } : tok);
+      } catch {
+        return null;
+      }
+    })();
+    if (!m) return { correct, total, error: `"${tok}" is not a legal move at that point in the line.` };
+    const r = run.tryMove(toUci(m));
+    if (r.kind === "wrong") return { correct, total, error: `${m.san} is where the line goes wrong.` };
+    correct += 1;
+  }
+  if (!run.done) return { correct, total, error: correct === 0 ? "No moves were entered." : `The line stops too early: ${total - correct} more move${total - correct === 1 ? "" : "s"} were needed.` };
+  return { correct, total, error: null };
+}
