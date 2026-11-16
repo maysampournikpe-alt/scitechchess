@@ -4,7 +4,7 @@ import { fromRow, type Puzzle, type PuzzleRow } from "@/lib/chess/puzzle";
 const base = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 let puzzles: Promise<Puzzle[]> | null = null;
 
-/** The shipped puzzle set (3,285 puzzles from the Lichess database, CC0), sorted by rating. Loaded once, on demand. */
+/** The shipped puzzle set (12,396 puzzles selected from the Lichess database, CC0), sorted by rating. Loaded once, on demand. */
 export function loadPuzzles(): Promise<Puzzle[]> {
   if (!puzzles)
     puzzles = fetch(`${base}/data/puzzles.json`)

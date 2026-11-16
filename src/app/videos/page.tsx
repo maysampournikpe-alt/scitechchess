@@ -20,7 +20,7 @@ function Player({ v }: { v: Verified }) {
           allowFullScreen
         />
       ) : (
-        <button className="grid h-full w-full place-items-center text-center" onClick={() => setOn(true)} aria-label={`Play ${v.title}`}>
+        <button className="grid h-full w-full place-items-center text-center" onClick={() => setOn(true)} aria-label={`Play video: ${v.title}`}>
           <span className="btn btn-primary">Play video</span>
         </button>
       )}
@@ -44,8 +44,8 @@ export default function VideosPage() {
       {videos && videos.length > 0 && (
         <div className="grid gap-10">
           {topics.map((t) => (
-            <section key={t} aria-labelledby={t}>
-              <h2 id={t} className="text-2xl">
+            <section key={t} aria-labelledby={`topic-${t.replace(/\W+/g, "-")}`}>
+              <h2 id={`topic-${t.replace(/\W+/g, "-")}`} className="text-2xl">
                 {t}
               </h2>
               <ul className="mt-3 grid gap-5 md:grid-cols-2 xl:grid-cols-3">

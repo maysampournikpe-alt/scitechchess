@@ -1,6 +1,6 @@
 // Builds public/data/puzzles.json from the full Lichess puzzle database (CC0).
 //
-// Runs before `next build` on Vercel (or when PUZZLES_DOWNLOAD=1). It streams the ~250 MB
+// Run with PUZZLES_DOWNLOAD=1 (on a machine or build with internet access). It streams the ~250 MB
 // compressed CSV, keeps well-rated puzzles (popular, often played, stable rating), picks a
 // reproducible spread across ratings and themes, and checks every kept puzzle with chess.js.
 // If anything fails (no network, bad data), the committed file is left untouched and the
@@ -17,7 +17,8 @@ const MIN_PER_THEME = 150;
 // Themes the trainer offers by name (src/lib/learning/select.ts): make sure each has enough puzzles.
 const THEMES = readFileSync(new URL("../src/lib/learning/select.ts", import.meta.url), "utf8").match(/id: "(\w+)"/g).map((m) => m.slice(5, -1));
 
-const enabled = process.env.PUZZLES_DOWNLOAD === "1" || process.env.VERCEL === "1";
+// Manual only: the import takes about 7 minutes, too long for every deploy. The result is committed.
+const enabled = process.env.PUZZLES_DOWNLOAD === "1";
 if (!enabled) {
   console.log("[puzzles] skipped: set PUZZLES_DOWNLOAD=1 to rebuild from the Lichess database");
   process.exit(0);

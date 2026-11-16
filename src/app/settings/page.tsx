@@ -140,7 +140,7 @@ function Settings() {
           </li>
           <li>Chessground board by Lichess, GPL-3.0-or-later.</li>
           <li>chess.js, BSD-2-Clause.</li>
-          <li>Puzzles: Lichess puzzle database (selection via the daily-chess-puzzle project), CC0.</li>
+          <li>Puzzles: 12,396 selected from the Lichess puzzle database, CC0.</li>
           <li>Opening names: lichess-org/chess-openings, CC0.</li>
           <li>Endgame results: Lichess tablebase API, queried live when available.</li>
           <li>Fonts: Fraunces and Figtree, SIL Open Font License.</li>
