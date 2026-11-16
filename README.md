@@ -1,36 +1,42 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ChessMastery AI
 
-## Getting Started
+A free chess training site that adapts to the learner: an assessment, a daily plan built from
+measured results, adaptive puzzles, opening, middlegame and endgame lessons with real board
+practice, games against Stockfish with move-by-move review, and spaced review of every mistake.
 
-First, run the development server:
+There is no multiplayer, no account, no paid tier and no server. Everything runs in the
+browser and progress is saved on the device.
+
+## Run it
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run dev        # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+```bash
+npm test           # 110 unit, content and engine tests (Vitest)
+npm run build      # static site in out/
+npm run e2e        # 20 browser tests on desktop and phone (Playwright), after a build
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+`out/` can be served by any static host (GitHub Pages, Cloudflare Pages, Netlify). The
+engine files need the `application/wasm` MIME type, which all of these send.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Where things are
 
-## Learn More
+| Path | What |
+|---|---|
+| `src/lib/chess/` | Rules helpers, puzzle runner, position facts used for feedback text, tablebase client |
+| `src/lib/engine/` | UCI client, move classification, bot levels, game review |
+| `src/lib/learning/` | Skill scores (Glicko-1), spaced repetition, mastery rules, plans, reports, coach |
+| `src/lib/store/` | Local progress store (localStorage), export, import, delete |
+| `src/content/` | Opening, endgame and middlegame lessons (all checked by tests) |
+| `src/app/` | One folder per page |
+| `supabase/` | Optional cloud-sync schema with row-level security, and its isolation test (not used yet) |
+| `docs/ARCHITECTURE.md` | Design, data sources, running costs, what is finished and what is not |
 
-To learn more about Next.js, take a look at the following resources:
+## Licence
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+GPL-3.0-or-later, because it ships Stockfish and Chessground, which are GPL. Data: Lichess
+puzzle and opening-name databases (CC0). See Settings → Licences in the app.
