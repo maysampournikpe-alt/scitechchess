@@ -113,7 +113,7 @@ test("other modules load with real content and no page errors", async ({ page })
     ["/mistakes/", "Nothing to review yet"],
     ["/progress/", "No results yet"],
     ["/coach/", "What should I study today?"],
-    ["/videos/", "No curated videos yet"],
+    ["/videos/", "No videos could be confirmed for this version"],
     ["/settings/", "Licences and source code"],
   ] as const) {
     await page.goto(path);

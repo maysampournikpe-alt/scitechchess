@@ -1,22 +1,3 @@
-/**
- * Curated video library. EMPTY ON PURPOSE until each link is verified: a video is added only
- * after `node scripts/verify-videos.mjs` has confirmed through YouTube's oEmbed endpoint that it
- * exists and allows embedding. Never add a link from memory.
- */
-export type Video = {
-  youtubeId: string;
-  title: string;
-  channel: string;
-  /** Concept ids from the rest of the app, e.g. "theme:fork", "endgame:lucena", "plan:iqp-activity". */
-  concepts: string[];
-  level: "beginner" | "intermediate" | "advanced";
-  /** Where to practise right after watching. */
-  practiceHref: string;
-  verifiedAt: string;
-};
-
-export const VIDEOS: Video[] = [];
-
 /** Channels to search per topic. These are search links, not claims about any specific video. */
 export const CHANNELS = ["Daniel Naroditsky", "John Bartholomew", "ChessNetwork", "Saint Louis Chess Club", "Hanging Pawns", "GothamChess", "Chess Vibes", "Remote Chess Academy", "PowerPlayChess", "Chessbrah"];
 

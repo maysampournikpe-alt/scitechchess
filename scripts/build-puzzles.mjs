@@ -42,10 +42,29 @@ function valid(fen, moves, themes) {
   }
 }
 
+/** Keeps the `cap` items with the lowest hash, using O(cap) memory however many are offered. */
+class Lowest {
+  constructor(cap) {
+    this.cap = cap;
+    this.items = [];
+  }
+  offer(p) {
+    this.items.push(p);
+    if (this.items.length >= this.cap * 2) this.trim();
+  }
+  trim() {
+    this.items.sort((a, b) => a[5] - b[5]);
+    this.items.length = Math.min(this.items.length, this.cap);
+    return this.items;
+  }
+}
+
 async function main() {
+  const t0 = Date.now();
   const res = await fetch(SOURCE);
   if (!res.ok || !res.body) throw new Error(`download failed: HTTP ${res.status}`);
   const bands = new Map();
+  const themes = new Map(THEMES.map((t) => [t, new Lowest(MIN_PER_THEME)]));
   let rest = "";
   let rows = 0;
   let header = true;
@@ -53,17 +72,20 @@ async function main() {
     const lines = (rest + text).split("\n");
     rest = lines.pop();
     for (const line of lines) {
+      if (!line.trim()) continue;
       if (header) {
         header = false;
         continue;
       }
       rows++;
-      const [id, fen, moves, rating, dev, pop, plays, themes] = line.split(",");
+      const [id, fen, moves, rating, dev, pop, plays, tags] = line.split(",");
       if (Number(dev) > 80 || Number(pop) < 85 || Number(plays) < 1000) continue;
       const r = Number(rating);
+      const p = [id, fen, moves, r, tags, hash(id)];
       const band = Math.floor(r / 100);
-      if (!bands.has(band)) bands.set(band, []);
-      bands.get(band).push([id, fen, moves, r, themes, hash(id)]);
+      if (!bands.has(band)) bands.set(band, new Lowest(PER_BAND));
+      bands.get(band).offer(p);
+      for (const t of tags.split(" ")) themes.get(t)?.offer(p);
     }
   };
   const td = new TextDecoder();
@@ -71,31 +93,16 @@ async function main() {
   for await (const chunk of Readable.fromWeb(res.body)) zs.push(chunk);
   zs.push(new Uint8Array(0), true);
   onText("\n");
-  console.log(`[puzzles] read ${rows} puzzles`);
+  console.log(`[puzzles] read ${rows} puzzles in ${Math.round((Date.now() - t0) / 1000)} s`);
 
   const picked = new Map();
-  const all = [...bands.values()].flat().sort((a, b) => a[5] - b[5]);
-  for (const list of bands.values()) {
-    list.sort((a, b) => a[5] - b[5]);
-    for (const p of list.slice(0, PER_BAND)) picked.set(p[0], p);
-  }
-  const count = (t) => [...picked.values()].filter((p) => p[4].split(" ").includes(t)).length;
-  for (const t of THEMES) {
-    let n = count(t);
-    for (const p of all) {
-      if (n >= MIN_PER_THEME) break;
-      if (!picked.has(p[0]) && p[4].split(" ").includes(t)) {
-        picked.set(p[0], p);
-        n++;
-      }
-    }
-  }
+  for (const l of [...bands.values(), ...themes.values()]) for (const p of l.trim()) picked.set(p[0], p);
   const out = [...picked.values()].filter((p) => valid(p[1], p[2], p[4])).sort((a, b) => a[3] - b[3] || (a[0] < b[0] ? -1 : 1)).map((p) => [p[0], p[1], p[2], p[3], p[4]]);
   if (out.length < 5000) throw new Error(`only ${out.length} puzzles passed; keeping the committed set`);
   const tmp = OUT.pathname + ".tmp";
   writeFileSync(tmp, JSON.stringify(out));
   renameSync(tmp, OUT);
-  console.log(`[puzzles] wrote ${out.length} puzzles (${[...bands.keys()].length} rating bands)`);
+  console.log(`[puzzles] wrote ${out.length} puzzles (${bands.size} rating bands)`);
   console.log(`[puzzles] per theme: ${THEMES.map((t) => `${t}=${out.filter((p) => p[4].split(" ").includes(t)).length}`).join(" ")}`);
 }
 

@@ -71,6 +71,9 @@ export function Board({ fen, orientation = "w", movable = null, onMove, lastMove
   const [typedError, setTypedError] = useState("");
   const [announce, setAnnounce] = useState("");
   const [flipped, setFlipped] = useState(false);
+  // Keyboard play: a cursor square moved with the arrow keys; Enter or Space picks a piece, then its target.
+  const [cursor, setCursor] = useState<Square | null>(null);
+  const [picked, setPicked] = useState<Square | null>(null);
   const inputId = useId();
   const sound = useStore((s) => s.settings.sound);
   const prevPieces = useRef<number | null>(null);
@@ -132,8 +135,59 @@ export function Board({ fen, orientation = "w", movable = null, onMove, lastMove
       },
     });
     const shapes: DrawShape[] = (arrows ?? []).map((a) => ({ orig: a.from as Key, dest: a.to as Key | undefined, brush: a.color ?? "green" }));
+    if (cursor) shapes.push({ orig: cursor as Key, brush: "blue" });
+    if (picked) shapes.push({ orig: picked as Key, brush: "green" });
     cg.setAutoShapes(hidePieces ? [] : shapes);
-  }, [fen, side, turn, canMove, chess, lastMove, arrows, hidePieces, resetKey]);
+  }, [fen, side, turn, canMove, chess, lastMove, arrows, hidePieces, resetKey, cursor, picked]);
+
+  function describeSquare(sq: Square) {
+    const p = chess.get(sq);
+    return `${sq}, ${p ? `${p.color === "w" ? "white" : "black"} ${PIECE_NAME[p.type]}` : "empty"}`;
+  }
+
+  function onBoardKey(e: React.KeyboardEvent) {
+    const moves: Record<string, [number, number]> = { ArrowUp: [0, 1], ArrowDown: [0, -1], ArrowLeft: [-1, 0], ArrowRight: [1, 0] };
+    if (e.key in moves) {
+      e.preventDefault();
+      const flip = side === "black" ? -1 : 1;
+      const from = cursor ?? (side === "black" ? "e8" : "e1");
+      const f = Math.min(7, Math.max(0, from.charCodeAt(0) - 97 + moves[e.key][0] * flip));
+      const r = Math.min(8, Math.max(1, Number(from[1]) + moves[e.key][1] * flip));
+      const sq = (String.fromCharCode(97 + f) + r) as Square;
+      setCursor(sq);
+      setAnnounce(describeSquare(sq) + (picked ? `. Moving the piece from ${picked}.` : ""));
+      return;
+    }
+    if ((e.key === "Enter" || e.key === " ") && cursor && canMove) {
+      e.preventDefault();
+      if (!picked) {
+        const p = chess.get(cursor);
+        if (p && p.color === turn && legalDests(chess).has(cursor)) {
+          setPicked(cursor);
+          setAnnounce(`Picked up the ${PIECE_NAME[p.type]} on ${cursor}. Legal squares: ${legalDests(chess).get(cursor)!.join(", ")}.`);
+        } else setAnnounce(`No piece of yours that can move on ${cursor}.`);
+        return;
+      }
+      if (cursor === picked) {
+        setPicked(null);
+        setAnnounce("Put the piece back.");
+        return;
+      }
+      if (!legalDests(chess).get(picked)?.includes(cursor)) {
+        setAnnounce(`${picked} to ${cursor} is not legal.`);
+        return;
+      }
+      const from = picked;
+      setPicked(null);
+      if (isPromotion(chess, from, cursor)) setPromo({ from, to: cursor });
+      else onMoveRef.current?.(from + cursor);
+      return;
+    }
+    if (e.key === "Escape" && picked) {
+      setPicked(null);
+      setAnnounce("Cancelled.");
+    }
+  }
 
   // Play a sound when a move lands (piece count drops on a capture).
   useEffect(() => {
@@ -166,7 +220,14 @@ export function Board({ fen, orientation = "w", movable = null, onMove, lastMove
 
   return (
     <div className="w-full">
-      <div className="board-frame" data-fen={fen}>
+      <div
+        className="board-frame"
+        data-fen={fen}
+        tabIndex={canMove ? 0 : -1}
+        onKeyDown={onBoardKey}
+        onBlur={() => setCursor(null)}
+        aria-label={canMove ? "Board. Use the arrow keys to move between squares and Enter to pick up and place a piece." : undefined}
+      >
         <div ref={el} role="img" aria-label={`${label}. ${hidePieces ? "Pieces are hidden for this exercise." : describePosition(chess)}`} />
         {promo && (
           <div role="dialog" aria-modal="true" aria-label="Choose a piece to promote to" className="absolute inset-0 z-10 grid place-items-center bg-black/60">

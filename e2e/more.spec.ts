@@ -46,3 +46,14 @@ test("tournament prep, settings board colours, and new pages have no errors", as
   await expect(page.getByText("No results yet")).toBeVisible();
   expect(errors).toEqual([]);
 });
+
+test("the board can be played with the keyboard alone", async ({ page }) => {
+  await page.goto("/");
+  await page.locator(".board-frame").first().focus();
+  for (let i = 0; i < 4; i++) await page.keyboard.press("ArrowLeft"); // e1 -> a1
+  await page.keyboard.press("Enter");
+  await expect(page.getByText(/Picked up the rook on a1/)).toBeAttached();
+  for (let i = 0; i < 7; i++) await page.keyboard.press("ArrowUp"); // a1 -> a8
+  await page.keyboard.press("Enter");
+  await expect(page.getByText("Ra8# is checkmate")).toBeVisible();
+});
