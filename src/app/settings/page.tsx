@@ -45,6 +45,21 @@ function Settings() {
             ))}
           </div>
         </fieldset>
+        <fieldset>
+          <legend className="font-semibold">Board colours</legend>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {(["blue", "green", "wood"] as const).map((b) => (
+              <label key={b} className="choice w-auto" aria-checked={settings.board === b}>
+                <input type="radio" name="board" className="sr-only" checked={settings.board === b} onChange={() => set({ board: b })} />
+                {b[0].toUpperCase() + b.slice(1)}
+              </label>
+            ))}
+          </div>
+        </fieldset>
+        <label className="flex items-center gap-2">
+          <input type="checkbox" checked={settings.sound} onChange={(e) => set({ sound: e.target.checked })} className="h-4 w-4 accent-[var(--accent)]" />
+          Play a sound when a move is made
+        </label>
         <div>
           <label htmlFor="depth" className="font-semibold">
             Analysis depth: <span className="num">{settings.engineDepth}</span>

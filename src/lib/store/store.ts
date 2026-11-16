@@ -23,7 +23,7 @@ export type GameRecord = {
 
 export type SavedPosition = { id: string; fen: string; note: string; t: number; best?: string };
 export type JournalEntry = { id: string; t: number; text: string };
-export type Settings = { theme: "dark" | "light"; sound: boolean; engineDepth: number; explain: "simple" | "intermediate" | "advanced" };
+export type Settings = { theme: "dark" | "light"; board: "blue" | "green" | "wood"; sound: boolean; engineDepth: number; explain: "simple" | "intermediate" | "advanced" };
 
 export type NewAttempt = Omit<Attempt, "t" | "firstSeen"> & {
   /** Uncertainty of the item's difficulty: 80 for database puzzles, 200 for authored items. */
@@ -84,7 +84,7 @@ const initial: State = {
   journal: [],
   repertoire: [],
   assessmentDoneAt: null,
-  settings: { theme: "dark", sound: true, engineDepth: 14, explain: "simple" },
+  settings: { theme: "dark", board: "blue", sound: true, engineDepth: 14, explain: "simple" },
 };
 
 const uid = () => Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
@@ -171,7 +171,17 @@ export const useStore = create<State & Actions>()(
         try {
           const parsed = JSON.parse(json);
           const d = parsed?.data;
-          if (parsed?.app !== "chessmastery-ai" || typeof d !== "object" || !d || !Array.isArray(d.attempts) || typeof d.skills !== "object") return false;
+          if (parsed?.app !== "chessmastery-ai" || typeof d !== "object" || !d || !Array.isArray(d.attempts) || typeof d.skills !== "object" || !d.skills) return false;
+          // Every record must have the fields the pages read; a damaged file is refused as a whole.
+          const num = (v: unknown) => typeof v === "number" && Number.isFinite(v);
+          const str = (v: unknown) => typeof v === "string";
+          const okAttempt = (a: Attempt) => a && num(a.t) && str(a.itemId) && str(a.skill) && str(a.concept) && num(a.difficulty) && ["solo", "assisted", "failed"].includes(a.outcome) && num(a.hints) && num(a.ms) && typeof a.firstSeen === "boolean";
+          const okSkill = (k: SkillState) => k && num(k.score) && num(k.rd) && k.rd > 0 && num(k.n) && Array.isArray(k.history);
+          const okCard = (c: Card) => c && str(c.id) && str(c.label) && str(c.href) && c.href.startsWith("/") && num(c.due) && num(c.interval) && num(c.ease);
+          if (!d.attempts.every(okAttempt)) return false;
+          if (!Object.values(d.skills as Record<string, SkillState>).every(okSkill)) return false;
+          if (d.cards !== undefined && (typeof d.cards !== "object" || !Object.values(d.cards as Record<string, Card>).every(okCard))) return false;
+          for (const k of ["games", "positions", "journal", "introduced", "repertoire"]) if (d[k] !== undefined && !Array.isArray(d[k])) return false;
           // Only known keys are taken from the file; anything else in it is ignored.
           const next: Partial<State> = {};
           for (const key of Object.keys(initial) as (keyof State)[]) if (key !== "hydrated" && key in d) (next as Record<string, unknown>)[key] = d[key];

@@ -15,9 +15,9 @@ npm run dev        # http://localhost:3000
 ```
 
 ```bash
-npm test           # 110 unit, content and engine tests (Vitest)
+npm test           # 116 unit, content and engine tests (Vitest)
 npm run build      # static site in out/
-npm run e2e        # 20 browser tests on desktop and phone (Playwright), after a build
+npm run e2e        # 28 browser tests on desktop and phone (Playwright), after a build
 ```
 
 `out/` can be served by any static host (GitHub Pages, Cloudflare Pages, Netlify). The

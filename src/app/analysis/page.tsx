@@ -20,6 +20,7 @@ function Explorer({ initialFen }: { initialFen: string }) {
   const { engine, error } = useEngine();
   const depth = useStore((s) => s.settings.engineDepth);
   const savePosition = useStore((s) => s.savePosition);
+  const addCard = useStore((s) => s.addCard);
   const [history, setHistory] = useState<string[]>([initialFen]);
   const [lastMove, setLastMove] = useState<[string, string] | null>(null);
   const [lines, setLines] = useState<Line[]>([]);
@@ -90,11 +91,12 @@ function Explorer({ initialFen }: { initialFen: string }) {
             className="btn"
             disabled={saved}
             onClick={() => {
-              savePosition({ fen, best, note: "Saved from analysis" });
+              const id = savePosition({ fen, best, note: "A position you saved from analysis. Find the best move." });
+              addCard({ id: `pos:${id}`, kind: "concept", concept: "game:mistake", label: "Saved position: find the best move", href: `/mistakes/?pos=${id}` });
               setSaved(true);
             }}
           >
-            {saved ? "Saved" : "Save position"}
+            {saved ? "Added to review" : "Save as a review card"}
           </button>
         </div>
         <p className="num mt-2 break-all text-xs text-muted">{fen}</p>

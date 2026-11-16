@@ -47,6 +47,9 @@
   color-scheme: light;
 }
 
+:root[data-board="green"] { --sq-light: #eeeed2; --sq-dark: #769656; }
+:root[data-board="wood"] { --sq-light: #f0d9b5; --sq-dark: #b58863; }
+
 @theme inline {
   --color-bg: var(--bg);
   --color-surface: var(--surface);

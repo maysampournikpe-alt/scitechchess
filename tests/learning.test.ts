@@ -177,3 +177,18 @@ describe("weekly stats", () => {
     expect(w[0].attempts).toBe(0);
   });
 });
+
+import { weaknessDna } from "@/lib/learning/report";
+describe("weakness DNA", () => {
+  it("lists only patterns with enough evidence and a real miss rate, worst first", () => {
+    const list = [
+      ...["a", "b", "c", "d"].map((id, i) => att({ itemId: id, concept: "theme:pin", outcome: i < 3 ? "failed" : "solo" })),
+      ...["e", "f", "g", "h"].map((id) => att({ itemId: id, concept: "theme:fork", outcome: "solo" })),
+      ...["i", "j"].map((id) => att({ itemId: id, concept: "theme:skewer", outcome: "failed" })),
+      att({ itemId: "a", concept: "theme:pin", outcome: "failed", firstSeen: false }),
+    ];
+    const dna = weaknessDna(list);
+    expect(dna.map((d) => d.concept)).toEqual(["theme:pin"]);
+    expect(dna[0]).toMatchObject({ misses: 3, attempts: 4, label: "pin puzzles" });
+  });
+});

@@ -29,3 +29,25 @@ export async function judgeAfterMove(engine: UciClient, fen: string, useTablebas
   const score = a.lines[0]?.score;
   return { result: score ? flip(resultFromScore(score)) : "unclear", source: "engine", reply: a.bestmove };
 }
+
+/**
+ * Grade one move in one position: the engine searches the position (for the best move's score)
+ * and the position after the move, at the same depth, and the move is labelled with the
+ * thresholds in classify.ts.
+ */
+export async function gradeMove(engine: UciClient, fen: string, uci: string, depth = 12) {
+  const { Chess } = await import("chess.js");
+  const { applyUci } = await import("@/lib/chess/rules");
+  const { judge, negate } = await import("./classify");
+  const before = await engine.search(fen, { depth }, ANALYSIS_OPTIONS);
+  const c = new Chess(fen);
+  const m = applyUci(c, uci);
+  if (!m) throw new Error(`Illegal move ${uci}`);
+  const best = before.lines[0]?.score ?? { cp: 0 };
+  const isBest = before.bestmove === uci;
+  let after: Score;
+  if (c.isCheckmate()) after = { mate: 1 };
+  else if (c.isGameOver()) after = { cp: 0 };
+  else after = negate((await engine.search(c.fen(), { depth }, ANALYSIS_OPTIONS)).lines[0]?.score ?? { cp: 0 });
+  return { san: m.san, bestUci: before.bestmove, judgement: judge(best, isBest ? best : after, isBest) };
+}

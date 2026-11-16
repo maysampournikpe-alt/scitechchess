@@ -13,7 +13,7 @@ import { useStore } from "@/lib/store/store";
 type Phase = "playing" | "thinking" | "slipped" | "done" | "failed";
 
 /** Play a theoretical endgame out against the engine, with every move checked for whether it keeps the result. */
-export function EndgamePractice({ endgame }: { endgame: Endgame }) {
+export function EndgamePractice({ endgame, concept, href }: { endgame: Endgame; concept?: string; href?: string }) {
   const { engine, error } = useEngine();
   const record = useStore((s) => s.record);
   const chess = useRef(new Chess(endgame.fen));
@@ -27,7 +27,7 @@ export function EndgamePractice({ endgame }: { endgame: Endgame }) {
   const myMoves = useRef(0);
   const started = useRef(Date.now());
   const recorded = useRef(false);
-  const goalText = endgame.goal === "win" ? (endgame.until === "mate" ? "Deliver checkmate." : "Promote a pawn safely.") : `Hold the draw for ${endgame.holdMoves} moves.`;
+  const goalText = endgame.until === "mate" ? "Deliver checkmate." : endgame.until === "promote" ? "Promote a pawn safely." : endgame.goal === "win" ? `Keep the win for ${endgame.holdMoves} moves.` : `Hold the draw for ${endgame.holdMoves} moves.`;
 
   function restart() {
     chess.current = new Chess(endgame.fen);
@@ -51,13 +51,13 @@ export function EndgamePractice({ endgame }: { endgame: Endgame }) {
       itemId: `endgame-play:${endgame.id}`,
       module: "endgame",
       skill: "endgameConversion",
-      concept: `endgame:${endgame.id}`,
+      concept: concept ?? `endgame:${endgame.id}`,
       difficulty: endgame.difficulty,
       itemRd: 200,
       outcome: success && slips === 0 ? "solo" : "failed",
       hints: 0,
       ms: Date.now() - started.current,
-      card: { label: endgame.name, href: `/endgames/?id=${endgame.id}`, kind: "endgame" },
+      card: { label: endgame.name, href: href ?? `/endgames/?id=${endgame.id}`, kind: "endgame" },
     });
   }
 
@@ -93,7 +93,7 @@ export function EndgamePractice({ endgame }: { endgame: Endgame }) {
     }
 
     if (endgame.until === "promote" && move.promotion) return finish(true, `${move.san}: the pawn has promoted and the position is still winning.`);
-    if (endgame.until === "hold" && myMoves.current >= (endgame.holdMoves ?? 8)) return finish(true, `You kept the draw for ${myMoves.current} moves against the best attacking tries.`);
+    if (endgame.until === "hold" && myMoves.current >= (endgame.holdMoves ?? 8)) return finish(true, endgame.goal === "draw" ? `You kept the draw for ${myMoves.current} moves against the best attacking tries.` : `You kept a winning position for ${myMoves.current} moves against full-strength defence.`);
 
     const reply = verdict.reply ? applyUci(c, verdict.reply) : null;
     if (!reply) return finish(false, "The engine did not return a move. Restart the exercise.");

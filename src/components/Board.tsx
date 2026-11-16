@@ -7,6 +7,25 @@ import type { DrawShape } from "@lichess-org/chessground/draw";
 import type { Key } from "@lichess-org/chessground/types";
 import { applyText, isPromotion, legalDests, toUci } from "@/lib/chess/rules";
 import { PIECE_NAME } from "@/lib/chess/features";
+import { useStore } from "@/lib/store/store";
+
+let audio: AudioContext | null = null;
+/** A short synthesized click; lower and longer for a capture. No sound files are shipped. */
+function moveSound(capture: boolean) {
+  try {
+    audio ??= new AudioContext();
+    const o = audio.createOscillator();
+    const g = audio.createGain();
+    o.frequency.value = capture ? 220 : 440;
+    g.gain.setValueAtTime(0.08, audio.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.0001, audio.currentTime + (capture ? 0.16 : 0.08));
+    o.connect(g).connect(audio.destination);
+    o.start();
+    o.stop(audio.currentTime + 0.2);
+  } catch {
+    /* audio unavailable */
+  }
+}
 
 export type Arrow = { from: string; to?: string; color?: "green" | "red" | "blue" | "yellow" };
 
@@ -53,6 +72,8 @@ export function Board({ fen, orientation = "w", movable = null, onMove, lastMove
   const [announce, setAnnounce] = useState("");
   const [flipped, setFlipped] = useState(false);
   const inputId = useId();
+  const sound = useStore((s) => s.settings.sound);
+  const prevPieces = useRef<number | null>(null);
 
   const chess = useMemo(() => {
     try {
@@ -113,6 +134,13 @@ export function Board({ fen, orientation = "w", movable = null, onMove, lastMove
     const shapes: DrawShape[] = (arrows ?? []).map((a) => ({ orig: a.from as Key, dest: a.to as Key | undefined, brush: a.color ?? "green" }));
     cg.setAutoShapes(hidePieces ? [] : shapes);
   }, [fen, side, turn, canMove, chess, lastMove, arrows, hidePieces, resetKey]);
+
+  // Play a sound when a move lands (piece count drops on a capture).
+  useEffect(() => {
+    const count = chess.board().flat().filter(Boolean).length;
+    if (sound && lastMove && prevPieces.current !== null && !hidePieces) moveSound(count < prevPieces.current);
+    prevPieces.current = count;
+  }, [chess, lastMove, sound, hidePieces]);
 
   useEffect(() => {
     if (lastMove) setAnnounce(`Last move: ${lastMove[0]} to ${lastMove[1]}. ${turn === "w" ? "White" : "Black"} to move.`);

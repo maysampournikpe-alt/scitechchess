@@ -52,7 +52,7 @@ data. No language model is called, so there are no API costs and no invented var
 
 | Skill | Used for | Evidence |
 |---|---|---|
-| superpowers: writing-plans, test-driven development, verification | Plan, test-first core logic, no claim without a passing test | 110 unit tests, 20 browser tests |
+| superpowers: writing-plans, test-driven development, verification | Plan, test-first core logic, no claim without a passing test | 116 unit tests, 28 browser tests |
 | frontend-design | Visual direction: navy and brass palette, Fraunces + Figtree, one hero board instead of a stat block | `src/app/globals.css`, `src/app/page.tsx` |
 | ui-ux-pro-max | Generated a design-system recommendation; its "claymorphism, Comic Neue, no dark mode" output was rejected because the brief asks for dark navy and a serious tone; its checklist (focus states, 44px targets, reduced motion, 375px layouts) was applied | `docs/design/ui-ux-pro-max-output.txt` |
 | webapp-testing, Playwright | Browser tests on desktop and a Pixel 7 profile, plus screenshots during design | `e2e/` |
@@ -71,7 +71,7 @@ with four-step hints; calculation mode with blindfold option; board-vision drill
 lessons with guided and from-memory drills, idea questions, repertoire and name lookup;
 6 middlegame plan exercises and structure notes; 10 endgame lessons with find-the-move and
 play-out against Stockfish; bot games with nine levels, custom FEN, clock and draw claims;
-game review that turns your worst moves into exercises; PGN import; analysis board;
+game review that turns your worst moves into exercises; blunder-check trainer on real game positions; conversion trainer (winning positions played out against full-strength Stockfish); three annotated model games with replay and guess-the-move; Weakness DNA (recurring error patterns with their evidence); tournament preparation by days to the event; move sounds and three board colour sets; PGN import; analysis board;
 mistakes queue with spaced repetition; progress charts, mastery map and journal; coach;
 settings with export, import and delete; light and dark themes.
 
@@ -80,10 +80,8 @@ Not done yet:
   environment. `scripts/verify-videos.mjs` exists for when they can.
 - Puzzle set is 3,285 puzzles; the full Lichess set needs an import pipeline.
 - No accounts or sync (schema ready, not wired).
-- No opening explorer with game statistics, no master games, no model-game lessons.
-- No sounds, no board themes beyond light/dark, no drag-free arrow drawing tools beyond Chessground's right-click.
+- No opening explorer with game statistics (the Lichess explorer was not reachable from the build environment to test against).
+- Only three model games.
 - Internationalisation: texts are in English inside components; no i18n layer yet.
 - Accessibility: the board has a typed-move input and a spoken position description, but
   no square-by-square keyboard navigation; no automated axe audit has been run.
-- Imported data files are validated for shape only at the top level; a hand-edited file
-  with malformed attempts could break pages until "Delete all my data" is used.

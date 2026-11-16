@@ -7,6 +7,8 @@ import { useNow } from "@/lib/store/derived";
 import { confidence, currentRd, range, SKILLS, type SkillId } from "@/lib/learning/skills";
 import { mastery, MASTERY_LABEL, RULES } from "@/lib/learning/mastery";
 import { weeklyStats } from "@/lib/learning/stats";
+import { weaknessDna } from "@/lib/learning/report";
+import { conceptHref } from "@/lib/store/derived";
 import { ENDGAMES } from "@/content/endgames";
 import { OPENINGS } from "@/content/openings";
 import { PLAN_EXERCISES } from "@/content/middlegame";
@@ -116,6 +118,53 @@ function Line({ points, labels, label }: { points: (number | null)[]; labels: st
         </text>
       ))}
     </svg>
+  );
+}
+
+/** Recurring errors, each shown with the counts behind it and the positions where it happened. */
+function WeaknessDna() {
+  const attempts = useStore((s) => s.attempts);
+  const cards = useStore((s) => s.cards);
+  const dna = useMemo(() => weaknessDna(attempts), [attempts]);
+  return (
+    <section className="card p-5" aria-labelledby="dna">
+      <h2 id="dna" className="text-2xl">
+        Weakness DNA
+      </h2>
+      <p className="mt-1 max-w-[70ch] text-sm text-muted">Patterns you have met on at least four new positions and got wrong, or needed help with, at least 40% of the time.</p>
+      {dna.length === 0 ? (
+        <p className="mt-3 text-muted">No recurring weakness has enough evidence yet.</p>
+      ) : (
+        <ul className="mt-3 grid gap-3">
+          {dna.map((d) => {
+            const examples = Object.values(cards).filter((c) => c.concept === d.concept).slice(0, 3);
+            return (
+              <li key={d.concept} className="rounded-xl border border-line p-3">
+                <div className="flex flex-wrap items-baseline justify-between gap-2">
+                  <p className="font-semibold">{d.label}</p>
+                  <p className="num text-sm text-muted">
+                    {d.misses} of {d.attempts} new positions missed or helped
+                  </p>
+                </div>
+                <div className="mt-2 h-2 overflow-hidden rounded-full bg-raised" aria-hidden="true">
+                  <div className="h-full rounded-full bg-[var(--chart)]" style={{ width: `${Math.round(d.rate * 100)}%` }} />
+                </div>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  <Link className="btn" href={conceptHref(d.concept)}>
+                    Practise this
+                  </Link>
+                  {examples.map((c, i) => (
+                    <Link key={c.id} className="btn btn-quiet" href={c.href}>
+                      Example {i + 1}
+                    </Link>
+                  ))}
+                </div>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </section>
   );
 }
 
@@ -276,6 +325,8 @@ function Progress() {
           ))}
         </div>
       </section>
+
+      <WeaknessDna />
 
       <Journal />
       <p className="text-sm text-muted">

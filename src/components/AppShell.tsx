@@ -16,10 +16,12 @@ const NAV: { group: string; items: { href: string; label: string }[] }[] = [
       { href: "/openings/", label: "Openings" },
       { href: "/middlegame/", label: "Middlegame" },
       { href: "/endgames/", label: "Endgames" },
+      { href: "/blunder-check/", label: "Blunder check" },
+      { href: "/conversion/", label: "Convert and defend" },
       { href: "/play/", label: "Play the computer" },
     ],
   },
-  { group: "Review", items: [{ href: "/analysis/", label: "Analysis" }, { href: "/progress/", label: "My progress" }, { href: "/coach/", label: "My coach" }, { href: "/videos/", label: "Video academy" }] },
+  { group: "Review", items: [{ href: "/analysis/", label: "Analysis" }, { href: "/games/", label: "Model games" }, { href: "/tournament/", label: "Tournament prep" }, { href: "/progress/", label: "My progress" }, { href: "/coach/", label: "My coach" }, { href: "/videos/", label: "Video academy" }] },
   { group: "", items: [{ href: "/settings/", label: "Settings" }] },
 ];
 
@@ -41,6 +43,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const hydrated = useStore((s) => s.hydrated);
   const cards = useStore((s) => s.cards);
   const theme = useStore((s) => s.settings.theme);
+  const board = useStore((s) => s.settings.board);
   const [due, setDue] = useState(0);
 
   useEffect(() => {
@@ -49,10 +52,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!hydrated) return;
     document.documentElement.dataset.theme = theme;
+    document.documentElement.dataset.board = board;
     try {
       localStorage.setItem("cm-theme", theme);
     } catch {}
-  }, [theme, hydrated]);
+  }, [theme, board, hydrated]);
   useEffect(() => setDue(dueCards(Object.values(cards), Date.now()).length), [cards]);
   useEffect(() => setOpen(false), [pathname]);
   useEffect(() => {

@@ -83,3 +83,17 @@ export function recurringMisses(attempts: Attempt[], now: number, windowDays = 2
     .filter((s) => s.attempts >= 3 && s.attempts - s.solo >= 2 && s.rate <= 0.5)
     .sort((a, b) => b.attempts - b.solo - (a.attempts - a.solo));
 }
+
+export type DnaTrait = { concept: string; label: string; misses: number; attempts: number; rate: number; skill: SkillId };
+
+/**
+ * "Weakness DNA": every concept the learner has met at least `min` times on new positions and
+ * gets wrong or needs help with at least 40% of the time, worst first. Each trait carries its
+ * counts, so the page can show the evidence next to the claim.
+ */
+export function weaknessDna(attempts: Attempt[], min = MIN_SAMPLE): DnaTrait[] {
+  return conceptStats(attempts)
+    .filter((s) => s.attempts >= min && 1 - s.rate >= 0.4)
+    .map((s) => ({ concept: s.concept, label: conceptLabel(s.concept), misses: s.attempts - s.solo, attempts: s.attempts, rate: 1 - s.rate, skill: s.skill }))
+    .sort((a, b) => b.rate - a.rate || b.attempts - a.attempts);
+}

@@ -73,6 +73,13 @@ describe("progress store", () => {
     expect(useStore.getState().importData("{}")).toBe(false);
     expect(useStore.getState().importData("not json")).toBe(false);
     expect(useStore.getState().importData(JSON.stringify({ app: "chessmastery-ai", data: { attempts: "x", skills: {} } }))).toBe(false);
+    const damaged = JSON.parse(file);
+    damaged.data.attempts[0].t = "yesterday";
+    expect(useStore.getState().importData(JSON.stringify(damaged))).toBe(false);
+    const badLink = JSON.parse(file);
+    badLink.data.cards = { x: { ...Object.values(badLink.data.cards as Record<string, object>)[0], href: "https://evil.example" } };
+    expect(useStore.getState().importData(JSON.stringify(badLink))).toBe(false);
+    expect(useStore.getState().attempts).toHaveLength(0);
     expect(useStore.getState().importData(file)).toBe(true);
     expect(useStore.getState().attempts).toHaveLength(1);
   });

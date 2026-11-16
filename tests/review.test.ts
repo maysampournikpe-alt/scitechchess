@@ -3,6 +3,7 @@ import { createRequire } from "node:module";
 import { Chess } from "chess.js";
 import { UciClient } from "@/lib/engine/uci";
 import { reviewGame, turningPoints } from "@/lib/engine/review";
+import { gradeMove } from "@/lib/engine/judge";
 
 describe("game review", () => {
   const require = createRequire(import.meta.url);
@@ -35,6 +36,14 @@ describe("game review", () => {
     const c = new Chess(nf6.fenBefore);
     expect(() => c.move(nf6.bestSan!)).not.toThrow();
   });
+
+  it("calls giving away a bishop a blunder and a solid developing move fine", async () => {
+    const fen = "rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2";
+    expect((await gradeMove(client, fen, "f1a6", 10)).judgement.quality).toBe("blunder");
+    expect(["best", "excellent", "good"]).toContain((await gradeMove(client, fen, "g1f3", 10)).judgement.quality);
+    await expect(gradeMove(client, fen, "e1e3", 6)).rejects.toThrow();
+  });
+
 
   it("rejects an illegal game instead of analysing it", async () => {
     await expect(reviewGame(client, new Chess().fen(), ["e4", "Ke2"], 6)).rejects.toThrow();

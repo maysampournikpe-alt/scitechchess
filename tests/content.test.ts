@@ -5,6 +5,7 @@ import { Chess } from "chess.js";
 import { OPENINGS } from "@/content/openings";
 import { ENDGAMES } from "@/content/endgames";
 import { PLAN_EXERCISES } from "@/content/middlegame";
+import { MODEL_GAMES } from "@/content/games";
 import { UciClient, type Score } from "@/lib/engine/uci";
 import { ANALYSIS_OPTIONS } from "@/lib/engine/bot";
 
@@ -48,6 +49,22 @@ describe("opening lessons", () => {
       expect(new Set(OPENINGS.map((x) => x.id)).size).toBe(OPENINGS.length);
     });
   }
+});
+
+describe("model games", () => {
+  for (const g of MODEL_GAMES) {
+    it(`${g.id}: every move is legal, the game ends in mate, notes point at real moves`, () => {
+      const c = play(g.moves);
+      expect(c.isCheckmate()).toBe(true);
+      for (const ply of Object.keys(g.notes).map(Number)) expect(ply).toBeLessThanOrEqual(g.moves.length);
+    });
+  }
+  it("the double check quoted in the Réti note is a double check", () => {
+    const g = MODEL_GAMES.find((x) => x.id === "reti-tartakower")!;
+    const c = play(g.moves.slice(0, 19));
+    const king = c.board().flat().find((p) => p?.type === "k" && p.color === "b")!.square;
+    expect(c.attackers(king, "w")).toHaveLength(2);
+  });
 });
 
 describe("middlegame plan exercises", () => {
