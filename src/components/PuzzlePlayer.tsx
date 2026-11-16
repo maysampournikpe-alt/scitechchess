@@ -42,7 +42,8 @@ export function PuzzlePlayer({ puzzle, theme, module = "puzzle", strict, onDone,
   const [state, setState] = useState<"playing" | "solved" | "revealed">("playing");
   const [progress, setProgress] = useState("");
   const [rev, setRev] = useState(0);
-  const firstError = useRef(false);
+  const firstError = useRef(false); // read synchronously when scoring
+  const [missed, setMissed] = useState(false); // the same fact, for rendering
   const started = useRef(Date.now());
   const recorded = useRef(false);
   const startFen = useMemo(() => run.fen, [run]);
@@ -59,6 +60,7 @@ export function PuzzlePlayer({ puzzle, theme, module = "puzzle", strict, onDone,
     setState("playing");
     setProgress("");
     firstError.current = false;
+    setMissed(false);
     recorded.current = false;
     started.current = Date.now();
   }, [run]);
@@ -110,6 +112,7 @@ export function PuzzlePlayer({ puzzle, theme, module = "puzzle", strict, onDone,
     if (res.kind === "illegal") return;
     if (res.kind === "wrong") {
       firstError.current = true;
+      setMissed(true);
       void explainWrong(res.san, uci);
       setRev((r) => r + 1); // same position: make the board redraw so the piece snaps back
       if (strict) {
@@ -131,6 +134,7 @@ export function PuzzlePlayer({ puzzle, theme, module = "puzzle", strict, onDone,
 
   function reveal() {
     firstError.current = true;
+    setMissed(true);
     while (!run.done) run.playExpected();
     setFen(run.fen);
     setLastMove(run.lastMove);
@@ -206,9 +210,9 @@ export function PuzzlePlayer({ puzzle, theme, module = "puzzle", strict, onDone,
 
         {state !== "playing" && (
           <>
-            <Feedback tone={state === "solved" && !firstError.current ? "good" : "bad"}>
+            <Feedback tone={state === "solved" && !missed ? "good" : "bad"}>
               <p className="font-semibold">
-                {state === "revealed" ? (strict ? "Not this time." : "Solution shown.") : firstError.current ? "Solved after a wrong try." : hints > 0 ? `Solved with ${hints} hint${hints === 1 ? "" : "s"}.` : "Solved without help."}
+                {state === "revealed" ? (strict ? "Not this time." : "Solution shown.") : missed ? "Solved after a wrong try." : hints > 0 ? `Solved with ${hints} hint${hints === 1 ? "" : "s"}.` : "Solved without help."}
               </p>
               {strict && wrong && <p className="mt-1">You played {wrong.san}. {wrong.text}{wrong.refutation ? ` Engine line: ${wrong.refutation}.` : ""}</p>}
               <p className="mt-1">
@@ -217,7 +221,7 @@ export function PuzzlePlayer({ puzzle, theme, module = "puzzle", strict, onDone,
               {firstFacts && <p className="mt-1">{describeMove(firstFacts)}</p>}
               <p className="mt-1 text-muted">
                 Pattern: {themeLabel.toLowerCase()}.{" "}
-                {state === "revealed" || firstError.current || hints > 0 ? "Scheduled for spaced review." : ""}
+                {state === "revealed" || missed || hints > 0 ? "Scheduled for spaced review." : ""}
               </p>
             </Feedback>
             {onNext && (

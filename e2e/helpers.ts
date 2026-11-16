@@ -6,6 +6,7 @@ export const puzzles: Row[] = JSON.parse(readFileSync("public/data/puzzles.json"
 
 /** Click a square on a chessground board. `orientation` is the colour at the bottom. */
 export async function clickSquare(board: Locator, square: string, orientation: "w" | "b" = "w") {
+  await board.waitFor();
   const box = (await board.boundingBox())!;
   let file = square.charCodeAt(0) - 97;
   let rank = 8 - Number(square[1]);

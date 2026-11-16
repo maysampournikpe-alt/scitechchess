@@ -40,7 +40,7 @@ export function EndgamePractice({ endgame }: { endgame: Endgame }) {
     started.current = Date.now();
     recorded.current = false;
   }
-  useEffect(restart, [endgame]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(restart, [endgame]);
 
   function finish(success: boolean, text: string) {
     setPhase(success ? "done" : "failed");
