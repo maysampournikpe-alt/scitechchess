@@ -41,7 +41,7 @@ data. No language model is called, so there are no API costs and no invented var
 
 | Item | Cost | Limit |
 |---|---|---|
-| Hosting the static site (about 4 MB, 2.5 MB of it the engine and data) | Free on GitHub Pages, Cloudflare Pages or Netlify free tiers | Bandwidth caps of those tiers (Cloudflare Pages: unlimited requests; GitHub Pages: about 100 GB/month soft limit) |
+| Hosting the static site (about 5 MB in total, of which the engine is 1.9 MB and the puzzle and opening data 0.9 MB) | Free on GitHub Pages, Cloudflare Pages or Netlify free tiers | Bandwidth caps of those tiers (Cloudflare Pages: unlimited requests; GitHub Pages: about 100 GB/month soft limit) |
 | Engine analysis, bot games, reviews | Free: runs on the user's device | Slow on very old phones; depth is adjustable in Settings |
 | Tablebase lookups | Free public Lichess API | Rate-limited per IP; the app falls back to Stockfish |
 | Optional cloud sync (Supabase, schema in `supabase/`) | Free tier: 500 MB database, 50k monthly active users | Beyond that, about $25/month. Not enabled. |
