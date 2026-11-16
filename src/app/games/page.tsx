@@ -108,7 +108,7 @@ function Guess({ g }: { g: ModelGame }) {
     const actual = line[ply];
     const hit = m.san === actual.san;
     setScore((s) => ({ tried: s.tried + 1, matched: s.matched + (hit ? 1 : 0) }));
-    setMsg({ tone: hit ? "good" : "bad", text: hit ? `${actual.san}: the move played.${g.notes[ply + 1] ? ` ${g.notes[ply + 1]}` : ""}` : `You chose ${m.san}. ${g.white.split(" ").at(-1)} played ${actual.san}.${g.notes[ply + 1] ? ` ${g.notes[ply + 1]}` : ""}` });
+    setMsg({ tone: hit ? "good" : "bad", text: hit ? `${actual.san}: the move played.${g.notes[ply + 1] ? ` ${g.notes[ply + 1]}` : ""}` : `You chose ${m.san}. ${(g.learner === "w" ? g.white : g.black).split(" ").at(-1)} played ${actual.san}.${g.notes[ply + 1] ? ` ${g.notes[ply + 1]}` : ""}` });
     setRev((r) => r + 1);
     setPly(ply + 1);
   }
