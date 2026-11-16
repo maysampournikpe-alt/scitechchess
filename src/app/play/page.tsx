@@ -155,7 +155,7 @@ function Play() {
             <legend className="text-lg font-semibold">Opponent</legend>
             <div className="mt-2 grid gap-2 sm:grid-cols-3">
               {BOT_LEVELS.map((b) => (
-                <label key={b.id} className="choice" aria-checked={level === b.id}>
+                <label key={b.id} className="choice">
                   <input type="radio" name="level" className="sr-only" checked={level === b.id} onChange={() => setLevel(b.id)} />
                   <span className="font-semibold">
                     {b.id}. {b.name}
@@ -171,7 +171,7 @@ function Play() {
               <legend className="text-lg font-semibold">Your colour</legend>
               <div className="mt-2 flex gap-2">
                 {(["w", "b"] as const).map((x) => (
-                  <label key={x} className="choice" aria-checked={color === x}>
+                  <label key={x} className="choice">
                     <input type="radio" name="color" className="sr-only" checked={color === x} onChange={() => setColor(x)} />
                     {x === "w" ? "White" : "Black"}
                   </label>

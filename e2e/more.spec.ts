@@ -15,7 +15,7 @@ test("blunder check grades a move with the engine", async ({ page }) => {
 
 test("model game: replay with notes, then guess the first move", async ({ page }) => {
   await page.goto("/games/?id=opera");
-  await page.getByRole("button", { name: "Next move" }).click();
+  await page.getByRole("button", { name: "Forward" }).click();
   await page.keyboard.press("ArrowRight");
   await expect(page.locator("[aria-current=true]")).toHaveText("e5");
   await page.getByRole("tab", { name: "Guess the move" }).click();

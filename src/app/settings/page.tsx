@@ -38,7 +38,7 @@ function Settings() {
           <legend className="font-semibold">Theme</legend>
           <div className="mt-2 flex gap-2">
             {(["dark", "light"] as const).map((t) => (
-              <label key={t} className="choice w-auto" aria-checked={settings.theme === t}>
+              <label key={t} className="choice w-auto">
                 <input type="radio" name="theme" className="sr-only" checked={settings.theme === t} onChange={() => set({ theme: t })} />
                 {t === "dark" ? "Dark" : "Light"}
               </label>
@@ -49,7 +49,7 @@ function Settings() {
           <legend className="font-semibold">Board colours</legend>
           <div className="mt-2 flex flex-wrap gap-2">
             {(["blue", "green", "wood"] as const).map((b) => (
-              <label key={b} className="choice w-auto" aria-checked={settings.board === b}>
+              <label key={b} className="choice w-auto">
                 <input type="radio" name="board" className="sr-only" checked={settings.board === b} onChange={() => set({ board: b })} />
                 {b[0].toUpperCase() + b.slice(1)}
               </label>
@@ -66,6 +66,19 @@ function Settings() {
           </label>
           <input id="depth" type="range" min={8} max={22} value={settings.engineDepth} onChange={(e) => set({ engineDepth: Number(e.target.value) })} className="mt-2 block w-full max-w-sm accent-[var(--accent)]" />
           <p className="text-sm text-muted">Lower is faster and easier on older laptops and phones. Game reviews use at most 14.</p>
+        </div>
+        <div>
+          <label htmlFor="token" className="font-semibold">
+            Lichess API token (optional)
+          </label>
+          <input id="token" type="password" autoComplete="off" className="input mt-2 max-w-md" value={settings.lichessToken} onChange={(e) => set({ lichessToken: e.target.value.trim() })} placeholder="lip_..." />
+          <p className="mt-1 max-w-[65ch] text-sm text-muted">
+            Needed only for the opening explorer on the Analysis page, because Lichess requires a login for it. Create a token with no permissions ticked at{" "}
+            <a className="underline" href="https://lichess.org/account/oauth/token" target="_blank" rel="noopener noreferrer">
+              lichess.org/account/oauth/token
+            </a>
+            . It stays in this browser, is sent only to explorer.lichess.ovh, and is never included in exported data.
+          </p>
         </div>
         <Link href="/onboarding/" className="btn self-start">
           Change goal, time, rating or learning style

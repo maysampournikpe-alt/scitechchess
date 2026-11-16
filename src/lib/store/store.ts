@@ -23,7 +23,7 @@ export type GameRecord = {
 
 export type SavedPosition = { id: string; fen: string; note: string; t: number; best?: string };
 export type JournalEntry = { id: string; t: number; text: string };
-export type Settings = { theme: "dark" | "light"; board: "blue" | "green" | "wood"; sound: boolean; engineDepth: number; explain: "simple" | "intermediate" | "advanced" };
+export type Settings = { theme: "dark" | "light"; board: "blue" | "green" | "wood"; lichessToken: string; sound: boolean; engineDepth: number; explain: "simple" | "intermediate" | "advanced" };
 
 export type NewAttempt = Omit<Attempt, "t" | "firstSeen"> & {
   /** Uncertainty of the item's difficulty: 80 for database puzzles, 200 for authored items. */
@@ -84,7 +84,7 @@ const initial: State = {
   journal: [],
   repertoire: [],
   assessmentDoneAt: null,
-  settings: { theme: "dark", board: "blue", sound: true, engineDepth: 14, explain: "simple" },
+  settings: { theme: "dark", board: "blue", lichessToken: "", sound: true, engineDepth: 14, explain: "simple" },
 };
 
 const uid = () => Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
@@ -165,6 +165,8 @@ export const useStore = create<State & Actions>()(
         const { hydrated: _h, ...rest } = get();
         void _h;
         const data = Object.fromEntries(Object.entries(rest).filter(([, v]) => typeof v !== "function"));
+        // The Lichess token is a credential: it never goes into a backup file.
+        data.settings = { ...(data.settings as Settings), lichessToken: "" };
         return JSON.stringify({ app: "chessmastery-ai", version: 1, exportedAt: new Date().toISOString(), data }, null, 2);
       },
       importData(json) {

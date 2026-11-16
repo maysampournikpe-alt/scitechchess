@@ -43,10 +43,10 @@ function Replay({ g }: { g: ModelGame }) {
           <button className="btn" onClick={() => setPly(0)} disabled={ply === 0}>
             Start
           </button>
-          <button className="btn" onClick={() => setPly(ply - 1)} disabled={ply === 0} aria-label="Previous move">
+          <button className="btn" onClick={() => setPly(ply - 1)} disabled={ply === 0}>
             Back
           </button>
-          <button className="btn btn-primary" onClick={() => setPly(ply + 1)} disabled={ply === line.length} aria-label="Next move">
+          <button className="btn btn-primary" onClick={() => setPly(ply + 1)} disabled={ply === line.length}>
             Forward
           </button>
           <Link className="btn btn-quiet" href={`/analysis/?fen=${encodeURIComponent(fen)}`}>

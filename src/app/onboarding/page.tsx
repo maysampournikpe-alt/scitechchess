@@ -112,7 +112,7 @@ export default function Onboarding() {
   }
 
   const radio = (name: string, value: string, current: string, set: (v: string) => void, label: string) => (
-    <label key={value} className="choice flex items-center gap-3" aria-checked={current === value}>
+    <label key={value} className="choice flex items-center gap-3">
       <input type="radio" name={name} value={value} checked={current === value} onChange={() => set(value)} className="h-4 w-4 accent-[var(--accent)]" />
       {label}
     </label>
@@ -215,7 +215,7 @@ export default function Onboarding() {
             </legend>
             <div className="mt-5 grid grid-cols-2 gap-2 sm:grid-cols-4">
               {MINUTES.map((m) => (
-                <label key={m} className="choice flex items-center gap-3" aria-checked={customMinutes === "" && minutes === m}>
+                <label key={m} className="choice flex items-center gap-3">
                   <input type="radio" name="minutes" checked={customMinutes === "" && minutes === m} onChange={() => (setMinutes(m), setCustomMinutes(""))} className="h-4 w-4 accent-[var(--accent)]" />
                   {m === 120 ? "2+ hours" : `${m} minutes`}
                 </label>
@@ -243,7 +243,7 @@ export default function Onboarding() {
               {WEAKNESSES.map(([v, l]) => {
                 const on = weak.includes(v);
                 return (
-                  <label key={v} className="choice flex items-center gap-3" aria-checked={on}>
+                  <label key={v} className="choice flex items-center gap-3">
                     <input
                       type="checkbox"
                       checked={on}

@@ -31,9 +31,11 @@ data. No language model is called, so there are no API costs and no invented var
 
 | Data | Source | Licence | Notes |
 |---|---|---|---|
-| Puzzles | 3,285 puzzles from the Lichess puzzle database, via the daily-chess-puzzle project's curated selection | CC0 | The full 5M-puzzle file could not be downloaded from this build environment (database.lichess.org not reachable). Importing a larger, theme-balanced set is the first data task. |
+| Puzzles | A selection from the full Lichess puzzle database (6.19M puzzles): popularity ≥ 85, ≥ 1,000 plays, rating deviation ≤ 80; a reproducible spread of up to 600 per 100-point rating band plus at least 150 per trained theme; every puzzle re-checked with chess.js. Built by `scripts/build-puzzles.mjs` (`PUZZLES_DOWNLOAD=1`). | CC0 | The download and filtering take about 7 minutes, so it is run on demand, not on every deploy. |
 | Opening names | lichess-org/chess-openings, 3,865 lines | CC0 | Names and moves only; no game statistics. |
 | Endgame results | tablebase.lichess.ovh | Free public API | Queried live, ≤ 7 pieces, falls back to Stockfish. |
+| Opening statistics | explorer.lichess.ovh | Free, but requires a Lichess API token since 2025 | The learner pastes their own token in Settings; it is sent only to the explorer and never exported. Untested against the live service from the build environment, which has no token. |
+| Videos | Candidates in `src/content/video-candidates.ts`, found by web search | Embedded through YouTube's own player | `scripts/verify-videos.mjs` checks every ID with YouTube's oEmbed during the Vercel build and publishes only confirmed videos, with YouTube's own title and channel. |
 | Engine | Stockfish 19 via stockfish.js | GPL-3.0 | Licence served at `/engine/COPYING.txt`. |
 | Board | Chessground (Lichess) | GPL-3.0-or-later | The reason the whole app is GPL. |
 
@@ -76,12 +78,9 @@ mistakes queue with spaced repetition; progress charts, mastery map and journal;
 settings with export, import and delete; light and dark themes.
 
 Not done yet:
-- The video academy has no curated videos: links could not be verified from the build
-  environment. `scripts/verify-videos.mjs` exists for when they can.
-- Puzzle set is 3,285 puzzles; the full Lichess set needs an import pipeline.
 - No accounts or sync (schema ready, not wired).
-- No opening explorer with game statistics (the Lichess explorer was not reachable from the build environment to test against).
 - Only three model games.
 - Internationalisation: texts are in English inside components; no i18n layer yet.
-- Accessibility: the board has a typed-move input and a spoken position description, but
-  no square-by-square keyboard navigation; no automated axe audit has been run.
+- Accessibility: the board supports arrow-key navigation, Enter to move, typed moves and a
+  spoken position description; no automated axe audit has been run.
+- Three Vercel projects are linked to this repository and all build every push.

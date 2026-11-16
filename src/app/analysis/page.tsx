@@ -13,8 +13,94 @@ import { applyUci, validFen } from "@/lib/chess/rules";
 import { describeMove, forcingMoves, moveFacts, opponentThreats } from "@/lib/chess/features";
 import type { Line } from "@/lib/engine/uci";
 import { useStore } from "@/lib/store/store";
+import { fetchExplorer, type ExplorerResult } from "@/lib/chess/explorer";
 
 const MAX_PGN = 200_000;
+
+/** Move statistics from the Lichess database for the current position. Popularity, not advice. */
+function OpeningStats({ fen, onPlay }: { fen: string; onPlay: (uci: string) => void }) {
+  const token = useStore((s) => s.settings.lichessToken);
+  const [db, setDb] = useState<"masters" | "lichess">("masters");
+  const [res, setRes] = useState<ExplorerResult | { error: string } | null>(null);
+  useEffect(() => {
+    let live = true;
+    setRes(null);
+    const t = setTimeout(() => fetchExplorer(fen, db, token).then((r) => live && setRes(r)), 250);
+    return () => {
+      live = false;
+      clearTimeout(t);
+    };
+  }, [fen, db, token]);
+  const pct = (n: number, d: number) => (d ? Math.round((n / d) * 100) : 0);
+  return (
+    <section>
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <h2 className="text-xl">Opening explorer</h2>
+        <div className="flex gap-1" role="tablist" aria-label="Database">
+          {(["masters", "lichess"] as const).map((d) => (
+            <button key={d} role="tab" aria-selected={db === d} className={`btn min-h-9 px-3 py-1 text-sm ${db === d ? "btn-primary" : ""}`} onClick={() => setDb(d)}>
+              {d === "masters" ? "Masters" : "Lichess 1600+"}
+            </button>
+          ))}
+        </div>
+      </div>
+      <p className="text-sm text-muted">How often each move was played and how those games ended. This is popularity and history, not an engine evaluation or a recommendation.</p>
+      {res === null && <p role="status">Loading…</p>}
+      {res && "error" in res && (
+        <p className="mt-2 text-sm">
+          {res.error === "no-token" ? (
+            <>
+              The Lichess explorer needs a free Lichess token. Add one in{" "}
+              <Link className="underline" href="/settings/">
+                Settings
+              </Link>
+              .
+            </>
+          ) : res.error === "unauthorized" ? (
+            "Lichess did not accept the token. Check it in Settings."
+          ) : res.error === "rate-limited" ? (
+            "Lichess asked us to slow down. Try again in a minute."
+          ) : (
+            "The explorer could not be reached."
+          )}
+        </p>
+      )}
+      {res && !("error" in res) && (
+        <>
+          {res.opening && <p className="mt-1 font-semibold">{res.opening}</p>}
+          {res.moves.length === 0 ? (
+            <p className="mt-2 text-muted">No games in this database reach this position.</p>
+          ) : (
+            <table className="num mt-2 w-full text-left text-sm">
+              <thead className="text-muted">
+                <tr>
+                  <th className="py-1 font-normal" scope="col">Move</th>
+                  <th className="py-1 font-normal" scope="col">Games</th>
+                  <th className="py-1 font-normal" scope="col">White / draw / Black</th>
+                </tr>
+              </thead>
+              <tbody>
+                {res.moves.slice(0, 10).map((m) => (
+                  <tr key={m.uci} className="border-t border-line/60">
+                    <td className="py-1">
+                      <button className="underline" onClick={() => onPlay(m.uci)}>
+                        {m.san}
+                      </button>
+                    </td>
+                    <td className="py-1">{m.games.toLocaleString("en")}</td>
+                    <td className="py-1">
+                      {pct(m.white, m.games)}% / {pct(m.draws, m.games)}% / {pct(m.black, m.games)}%
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </>
+      )}
+    </section>
+  );
+}
 
 function Explorer({ initialFen }: { initialFen: string }) {
   const { engine, error } = useEngine();
@@ -123,6 +209,7 @@ function Explorer({ initialFen }: { initialFen: string }) {
             <p className="mt-1 text-sm text-muted">This sentence is generated from checked facts about the move (captures, checks, attacked pieces). It is not a full strategic explanation.</p>
           </section>
         )}
+        <OpeningStats fen={fen} onPlay={onMove} />
         <section>
           <h2 className="text-xl">Blunder check</h2>
           <ul className="mt-1 grid gap-1">

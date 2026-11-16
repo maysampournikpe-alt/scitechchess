@@ -66,7 +66,9 @@ describe("progress store", () => {
 
   it("exports everything, re-imports it, rejects foreign files, and deletes on reset", () => {
     useStore.getState().record({ ...base, outcome: "failed" });
+    useStore.getState().setSettings({ lichessToken: "lip_secret" });
     const file = useStore.getState().exportData();
+    expect(file).not.toContain("lip_secret");
     useStore.getState().reset();
     expect(useStore.getState().attempts).toHaveLength(0);
     expect(Object.keys(useStore.getState().cards)).toHaveLength(0);
