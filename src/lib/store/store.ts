@@ -30,6 +30,8 @@ export type NewAttempt = Omit<Attempt, "t" | "firstSeen"> & {
   itemRd?: number;
   /** Label and link used if this attempt creates a review card. */
   card?: { label: string; href: string; kind: Card["kind"] };
+  /** Whole games are not review cards; their mistakes are saved as separate positions instead. */
+  noCard?: boolean;
 };
 
 type State = {
@@ -55,7 +57,7 @@ type Actions = {
   addCard(c: Pick<Card, "id" | "kind" | "concept" | "label" | "href">): void;
   removeCard(id: string): void;
   saveGame(g: GameRecord): void;
-  savePosition(p: Omit<SavedPosition, "id" | "t">): void;
+  savePosition(p: Omit<SavedPosition, "id" | "t">): string;
   removePosition(id: string): void;
   addJournal(text: string): void;
   toggleRepertoire(id: string): void;
@@ -100,7 +102,7 @@ export const useStore = create<State & Actions>()(
       record(a) {
         const now = Date.now();
         const s = get();
-        const { itemRd, card, ...rest } = a;
+        const { itemRd, card, noCard, ...rest } = a;
         const attempt: Attempt = { ...rest, t: now, firstSeen: !(a.itemId in s.seen) };
         const skills = { ...s.skills, [a.skill]: update(s.skills[a.skill], a.difficulty, attemptResult(attempt), now, itemRd ?? 80) };
 
@@ -108,7 +110,9 @@ export const useStore = create<State & Actions>()(
         // a clean solve of an existing card pushes its next review further out.
         const cards = { ...s.cards };
         const existing = cards[a.itemId];
-        if (attempt.outcome !== "solo") {
+        if (noCard) {
+          /* no review card for this kind of attempt */
+        } else if (attempt.outcome !== "solo") {
           cards[a.itemId] = existing
             ? review(existing, "fail", now)
             : newCard({ id: a.itemId, kind: card?.kind ?? "concept", concept: a.concept, label: card?.label ?? a.concept, href: card?.href ?? "/train/" }, now);
@@ -135,7 +139,11 @@ export const useStore = create<State & Actions>()(
         set({ games: [...get().games.filter((x) => x.id !== g.id), g].slice(-200) });
       },
       savePosition(p) {
-        set({ positions: [...get().positions, { ...p, id: uid(), t: Date.now() }].slice(-500) });
+        const existing = get().positions.find((x) => x.fen === p.fen);
+        if (existing) return existing.id;
+        const id = uid();
+        set({ positions: [...get().positions, { ...p, id, t: Date.now() }].slice(-500) });
+        return id;
       },
       removePosition(id) {
         set({ positions: get().positions.filter((p) => p.id !== id) });
