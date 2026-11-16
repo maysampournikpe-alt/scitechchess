@@ -1,26 +1,195 @@
 @import "tailwindcss";
+@import "@lichess-org/chessground/assets/chessground.base.css";
+@import "@lichess-org/chessground/assets/chessground.brown.css";
+@import "@lichess-org/chessground/assets/chessground.cburnett.css";
 
+/* Design tokens. Dark navy is the default; light mode is a full second theme. */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg: #0a1228;
+  --surface: #101b3b;
+  --raised: #17264f;
+  --line: #2a3d73;
+  --text: #e9eefb;
+  --muted: #a6b4d8;
+  --accent: #74abff;
+  --accent-strong: #3f7ff2;
+  --on-accent: #06102a;
+  --brass: #e5bc6c;
+  --good: #5fd0a0;
+  --bad: #ff8585;
+  --warn: #f2c666;
+  --sq-light: #dbe5f7;
+  --sq-dark: #6283bd;
+  --shadow: 0 1px 0 rgb(255 255 255 / 0.04) inset, 0 12px 32px -16px rgb(0 0 0 / 0.6);
+  color-scheme: dark;
+}
+:root[data-theme="light"] {
+  --bg: #f3f6fc;
+  --surface: #ffffff;
+  --raised: #e9effb;
+  --line: #c9d5ee;
+  --text: #0f1b3d;
+  --muted: #485882;
+  --accent: #1d5ccc;
+  --accent-strong: #1d5ccc;
+  --on-accent: #ffffff;
+  --brass: #7d5a10;
+  --good: #136f4d;
+  --bad: #b32626;
+  --warn: #7a5a00;
+  --sq-light: #e6edf9;
+  --sq-dark: #7d9bcf;
+  --shadow: 0 10px 28px -18px rgb(15 27 61 / 0.35);
+  color-scheme: light;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-raised: var(--raised);
+  --color-line: var(--line);
+  --color-text: var(--text);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-accent-strong: var(--accent-strong);
+  --color-on-accent: var(--on-accent);
+  --color-brass: var(--brass);
+  --color-good: var(--good);
+  --color-bad: var(--bad);
+  --color-warn: var(--warn);
+  --font-sans: "Figtree Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Fraunces Variable", Georgia, serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  background: var(--bg);
 }
-
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  line-height: 1.55;
+  min-height: 100dvh;
 }
+h1, h2, h3 {
+  font-family: var(--font-display);
+  font-weight: 560;
+  letter-spacing: -0.01em;
+  line-height: 1.15;
+  text-wrap: balance;
+}
+p { text-wrap: pretty; }
+a { color: inherit; }
+button, [role="button"], summary, select, label[for] { cursor: pointer; }
+button:disabled { cursor: not-allowed; }
+
+:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Components */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+}
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 44px;
+  padding: 0.55rem 1.1rem;
+  border-radius: 10px;
+  font-weight: 650;
+  border: 1px solid var(--line);
+  background: var(--raised);
+  color: var(--text);
+  transition: background-color 150ms, border-color 150ms, transform 100ms;
+  text-decoration: none;
+}
+.btn:hover:not(:disabled) { border-color: var(--accent); }
+.btn:active:not(:disabled) { transform: translateY(1px); }
+.btn:disabled { opacity: 0.5; }
+.btn-primary {
+  background: var(--accent-strong);
+  border-color: var(--accent-strong);
+  color: #fff;
+}
+:root:not([data-theme="light"]) .btn-primary { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+.btn-primary:hover:not(:disabled) { filter: brightness(1.08); }
+.btn-quiet { background: transparent; }
+.input {
+  min-height: 44px;
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: var(--bg);
+  color: var(--text);
+}
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  font-size: 0.82rem;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.choice {
+  display: block;
+  width: 100%;
+  text-align: left;
+  min-height: 44px;
+  padding: 0.7rem 0.9rem;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--text);
+  transition: border-color 150ms, background-color 150ms;
+}
+.choice:hover:not(:disabled) { border-color: var(--accent); }
+.choice[aria-pressed="true"], .choice[aria-checked="true"] { border-color: var(--accent); background: var(--raised); }
+.choice[data-state="right"] { border-color: var(--good); }
+.choice[data-state="wrong"] { border-color: var(--bad); }
+.prose-lesson :where(p, ul, ol) { max-width: 68ch; }
+.prose-lesson ul { list-style: disc; padding-left: 1.2rem; }
+.prose-lesson li + li { margin-top: 0.3rem; }
+.num { font-variant-numeric: tabular-nums; }
+
+/* Chessboard: our own square colours over chessground's layout. */
+.board-frame {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 0 0 1px var(--line), 0 18px 40px -22px rgb(0 0 0 / 0.7);
+}
+.board-frame .cg-wrap { width: 100%; height: 100%; }
+cg-board {
+  background-color: var(--sq-light);
+  background-image: conic-gradient(var(--sq-dark) 90deg, var(--sq-light) 90deg 180deg, var(--sq-dark) 180deg 270deg, var(--sq-light) 270deg);
+  background-size: 25% 25%;
+}
+cg-board square.last-move { background-color: rgb(229 188 108 / 0.45); }
+cg-board square.selected { background-color: rgb(63 127 242 / 0.5); }
+cg-board square.move-dest { background: radial-gradient(rgb(10 18 40 / 0.45) 19%, transparent 21%); }
+cg-board square.oc.move-dest { background: radial-gradient(transparent 0%, transparent 79%, rgb(10 18 40 / 0.45) 80%); }
+cg-board square.check { background: radial-gradient(ellipse at center, rgb(255 60 60 / 0.95) 0%, rgb(231 0 0 / 0.6) 30%, transparent 70%); }
+.cg-wrap coords { font-family: var(--font-sans); font-weight: 650; font-size: 11px; }
+.cg-wrap coords coord { color: #26365e !important; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+}
+
+@keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.rise { animation: rise 420ms cubic-bezier(0.2, 0.7, 0.2, 1) both; }

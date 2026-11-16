@@ -1,0 +1,209 @@
+"use client";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
+import { Chess, type Square } from "chess.js";
+import { Chessground } from "@lichess-org/chessground";
+import type { Api } from "@lichess-org/chessground/api";
+import type { DrawShape } from "@lichess-org/chessground/draw";
+import type { Key } from "@lichess-org/chessground/types";
+import { applyText, isPromotion, legalDests, toUci } from "@/lib/chess/rules";
+import { PIECE_NAME } from "@/lib/chess/features";
+
+export type Arrow = { from: string; to?: string; color?: "green" | "red" | "blue" | "yellow" };
+
+type Props = {
+  fen: string;
+  orientation?: "w" | "b";
+  /** Which side the person may move. null = view only. */
+  movable?: "w" | "b" | "both" | null;
+  /** Called with a legal move in UCI. The parent owns the position and passes back a new `fen`. */
+  onMove?: (uci: string) => void;
+  lastMove?: [string, string] | null;
+  arrows?: Arrow[];
+  /** Hide the pieces (blindfold and calculation exercises). */
+  hidePieces?: boolean;
+  /** Show the typed-move box. On by default: it is the keyboard and screen-reader way to move. */
+  textInput?: boolean;
+  label?: string;
+  /** Change this number to make the board redraw the current position (e.g. to snap back a rejected move). */
+  resetKey?: number;
+};
+
+const PROMO = ["q", "r", "b", "n"] as const;
+
+/** Plain-language description of a position for screen readers. */
+function describePosition(chess: Chess): string {
+  const list = (color: "w" | "b") =>
+    chess
+      .board()
+      .flat()
+      .filter((p) => p && p.color === color)
+      .map((p) => `${PIECE_NAME[p!.type]} ${p!.square}`)
+      .join(", ");
+  return `${chess.turn() === "w" ? "White" : "Black"} to move. White: ${list("w")}. Black: ${list("b")}.`;
+}
+
+export function Board({ fen, orientation = "w", movable = null, onMove, lastMove, arrows, hidePieces, textInput = true, label = "Chessboard", resetKey = 0 }: Props) {
+  const el = useRef<HTMLDivElement>(null);
+  const api = useRef<Api | null>(null);
+  const onMoveRef = useRef(onMove);
+  onMoveRef.current = onMove;
+  const [promo, setPromo] = useState<{ from: Square; to: Square } | null>(null);
+  const [typed, setTyped] = useState("");
+  const [typedError, setTypedError] = useState("");
+  const [announce, setAnnounce] = useState("");
+  const [flipped, setFlipped] = useState(false);
+  const inputId = useId();
+
+  const chess = useMemo(() => {
+    try {
+      return new Chess(fen);
+    } catch {
+      return new Chess();
+    }
+  }, [fen]);
+  const turn = chess.turn();
+  const canMove = !!onMove && movable !== null && (movable === "both" || movable === turn) && !chess.isGameOver();
+  const side = (flipped ? (orientation === "w" ? "b" : "w") : orientation) === "w" ? "white" : "black";
+
+  useEffect(() => {
+    if (!el.current) return;
+    api.current = Chessground(el.current, { fen: hidePieces ? "8/8/8/8/8/8/8/8" : fen, orientation: side, coordinates: true, animation: { duration: 180 }, highlight: { lastMove: true, check: true }, premovable: { enabled: false }, drawable: { enabled: true } });
+    // Chessground caches the board's screen position. Recompute it whenever the layout changes
+    // (fonts loading, panels opening), otherwise clicks land on the wrong squares.
+    const refresh = () => api.current?.state.dom.bounds.clear();
+    const ro = new ResizeObserver(() => api.current?.redrawAll());
+    ro.observe(el.current);
+    ro.observe(document.body);
+    window.addEventListener("pointerdown", refresh, true);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("pointerdown", refresh, true);
+      api.current?.destroy();
+      api.current = null;
+    };
+    // The board is created once with the first position; later positions are applied by the effect below.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    const cg = api.current;
+    if (!cg) return;
+    cg.set({
+      fen: hidePieces ? "8/8/8/8/8/8/8/8" : fen,
+      orientation: side,
+      turnColor: turn === "w" ? "white" : "black",
+      check: !hidePieces && chess.inCheck(),
+      lastMove: lastMove && !hidePieces ? (lastMove as Key[]) : undefined,
+      viewOnly: !canMove,
+      movable: {
+        free: false,
+        color: canMove ? (turn === "w" ? "white" : "black") : undefined,
+        dests: canMove ? (legalDests(chess) as Map<Key, Key[]>) : new Map(),
+        showDests: true,
+        events: {
+          after: (orig, dest) => {
+            const from = orig as Square;
+            const to = dest as Square;
+            if (isPromotion(chess, from, to)) setPromo({ from, to });
+            else onMoveRef.current?.(from + to);
+          },
+        },
+      },
+    });
+    const shapes: DrawShape[] = (arrows ?? []).map((a) => ({ orig: a.from as Key, dest: a.to as Key | undefined, brush: a.color ?? "green" }));
+    cg.setAutoShapes(hidePieces ? [] : shapes);
+  }, [fen, side, turn, canMove, chess, lastMove, arrows, hidePieces, resetKey]);
+
+  useEffect(() => {
+    if (lastMove) setAnnounce(`Last move: ${lastMove[0]} to ${lastMove[1]}. ${turn === "w" ? "White" : "Black"} to move.`);
+  }, [lastMove, turn]);
+
+  function submitTyped(e: React.FormEvent) {
+    e.preventDefault();
+    const probe = new Chess(fen);
+    const m = applyText(probe, typed);
+    if (!m) {
+      setTypedError(`"${typed}" is not a legal move here. Use notation such as Nf3, exd5, O-O or e2e4.`);
+      return;
+    }
+    setTypedError("");
+    setTyped("");
+    onMove?.(toUci(m));
+  }
+
+  function cancelPromo() {
+    setPromo(null);
+    api.current?.set({ fen }); // put the pawn back
+  }
+
+  return (
+    <div className="w-full">
+      <div className="board-frame">
+        <div ref={el} role="img" aria-label={`${label}. ${hidePieces ? "Pieces are hidden for this exercise." : describePosition(chess)}`} />
+        {promo && (
+          <div role="dialog" aria-modal="true" aria-label="Choose a piece to promote to" className="absolute inset-0 z-10 grid place-items-center bg-black/60">
+            <div className="card flex flex-col gap-2 p-3">
+              <p className="px-1 text-sm">Promote to</p>
+              <div className="flex gap-2">
+                {PROMO.map((p, i) => (
+                  <button
+                    key={p}
+                    autoFocus={i === 0}
+                    className="btn"
+                    onClick={() => {
+                      const uci = promo.from + promo.to + p;
+                      setPromo(null);
+                      onMoveRef.current?.(uci);
+                    }}
+                  >
+                    {PIECE_NAME[p][0].toUpperCase() + PIECE_NAME[p].slice(1)}
+                  </button>
+                ))}
+              </div>
+              <button className="btn btn-quiet" onClick={cancelPromo}>
+                Cancel
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+      <p className="sr-only" aria-live="polite">
+        {announce}
+      </p>
+      <div className="mt-2 flex flex-wrap items-start gap-2">
+        {textInput && canMove && (
+          <form onSubmit={submitTyped} className="flex min-w-0 flex-1 items-start gap-2">
+            <div className="min-w-0 flex-1">
+              <label htmlFor={inputId} className="sr-only">
+                Type your move
+              </label>
+              <input
+                id={inputId}
+                className="input"
+                value={typed}
+                onChange={(e) => setTyped(e.target.value)}
+                placeholder="Type a move, e.g. Nf3"
+                autoComplete="off"
+                autoCapitalize="off"
+                spellCheck={false}
+                aria-invalid={!!typedError}
+                aria-describedby={typedError ? `${inputId}-err` : undefined}
+              />
+              {typedError && (
+                <p id={`${inputId}-err`} role="alert" className="mt-1 text-sm text-bad">
+                  {typedError}
+                </p>
+              )}
+            </div>
+            <button className="btn" type="submit">
+              Play
+            </button>
+          </form>
+        )}
+        <button className="btn btn-quiet ml-auto" onClick={() => setFlipped((f) => !f)} aria-label="Flip the board">
+          Flip
+        </button>
+      </div>
+    </div>
+  );
+}

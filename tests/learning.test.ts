@@ -103,7 +103,7 @@ describe("mastery needs repeated evidence on new positions and a delayed check",
 
 const profile: Profile = { experience: "casual", rating: null, ratingSource: "unrated", goal: "reach1200", goalRating: 1200, minutesPerDay: 60, weaknesses: [], preference: "mix", createdAt: T0 };
 function skillsWith(over: Partial<Record<SkillId, SkillState>>): Record<SkillId, SkillState> {
-  const base = Object.fromEntries(SKILLS.map((s) => [s.id, { score: 1200, rd: 90, n: 20, last: T0, history: [] }])) as Record<SkillId, SkillState>;
+  const base = Object.fromEntries(SKILLS.map((s) => [s.id, { score: 1200, rd: 90, n: 20, last: T0, history: [] }])) as unknown as Record<SkillId, SkillState>;
   return { ...base, ...over };
 }
 const input = (o: Partial<PlanInput> = {}): PlanInput => ({ profile, skills: skillsWith({}), dueReviews: 0, recurring: [], now: T0, ...o });
