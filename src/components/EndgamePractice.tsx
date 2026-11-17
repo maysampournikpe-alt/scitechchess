@@ -13,7 +13,7 @@ import { useStore } from "@/lib/store/store";
 type Phase = "playing" | "thinking" | "slipped" | "done" | "failed";
 
 /** Play a theoretical endgame out against the engine, with every move checked for whether it keeps the result. */
-export function EndgamePractice({ endgame, concept, href }: { endgame: Endgame; concept?: string; href?: string }) {
+export function EndgamePractice({ endgame, concept, href, context }: { endgame: Endgame; concept?: string; href?: string; context?: string }) {
   const { engine, error } = useEngine();
   const record = useStore((s) => s.record);
   const chess = useRef(new Chess(endgame.fen));
@@ -57,6 +57,7 @@ export function EndgamePractice({ endgame, concept, href }: { endgame: Endgame; 
       outcome: success && slips === 0 ? "solo" : "failed",
       hints: 0,
       ms: Date.now() - started.current,
+      context,
       card: { label: endgame.name, href: href ?? `/endgames/?id=${endgame.id}`, kind: "endgame" },
     });
   }

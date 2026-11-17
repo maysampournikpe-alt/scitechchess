@@ -6,7 +6,7 @@ import { useStore } from "@/lib/store/store";
 import { dueCards } from "@/lib/learning/srs";
 
 const NAV: { group: string; items: { href: string; label: string }[] }[] = [
-  { group: "Train", items: [{ href: "/train/", label: "Today" }, { href: "/assessment/", label: "Assessment" }, { href: "/mistakes/", label: "My mistakes" }] },
+  { group: "Train", items: [{ href: "/journey/", label: "Journey" }, { href: "/train/", label: "Today" }, { href: "/assessment/", label: "Assessment" }, { href: "/mistakes/", label: "My mistakes" }] },
   {
     group: "Practice",
     items: [

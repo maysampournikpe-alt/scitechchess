@@ -31,7 +31,7 @@ data. No language model is called, so there are no API costs and no invented var
 
 | Data | Source | Licence | Notes |
 |---|---|---|---|
-| Puzzles | A selection from the full Lichess puzzle database (6.19M puzzles): popularity ≥ 85, ≥ 1,000 plays, rating deviation ≤ 80; a reproducible spread of up to 600 per 100-point rating band plus at least 150 per trained theme; every puzzle re-checked with chess.js. Built by `scripts/build-puzzles.mjs` (`PUZZLES_DOWNLOAD=1`). | CC0 | The download and filtering take about 7 minutes, so it is run on demand, not on every deploy. |
+| Puzzles | A selection from the full Lichess puzzle database (6.19M puzzles): popularity ≥ 85, ≥ 1,000 plays, rating deviation ≤ 80; a reproducible spread of up to 2,000 per 100-point rating band plus at least 400 per trained theme (39,585 puzzles, stored as one file per rating band so a page loads only the range it needs); every puzzle re-checked with chess.js. Built by `scripts/build-puzzles.mjs`: run it with `PUZZLES_DOWNLOAD=1`, or push to the `refresh-puzzles` branch and copy the files from that Vercel preview. | CC0 | The download and filtering take about 7 minutes, so it is run on demand, not on every deploy. |
 | Opening names | lichess-org/chess-openings, 3,865 lines | CC0 | Names and moves only; no game statistics. |
 | Endgame results | tablebase.lichess.ovh | Free public API | Queried live, ≤ 7 pieces, falls back to Stockfish. |
 | Opening statistics | explorer.lichess.ovh | Free, but requires a Lichess API token since 2025 | The learner pastes their own token in Settings; it is sent only to the explorer and never exported. Untested against the live service from the build environment, which has no token. |
@@ -67,7 +67,7 @@ data. No language model is called, so there are no API costs and no invented var
 
 ## Status
 
-Working and tested: onboarding; assessment (22 tasks across six skills, adaptive tactics);
+Working and tested: the journey (eight levels from Foundations to Road to 2200+, each with a guide, units of lessons, puzzles, videos, openings, endgames, plans, model games and drills, ordered by the learner's weakest skills and goal, steps unlocking in order, and a level test of 8 puzzles that must be passed to move up; all progress derived from recorded results); 14 journey lessons whose move answers are checked with Stockfish; onboarding; assessment (22 tasks across six skills, adaptive tactics);
 skill profile with ranges; daily and weekly plans with reasons; adaptive and themed puzzles
 with four-step hints; calculation mode with blindfold option; board-vision drills; 19 opening
 lessons with guided and from-memory drills, idea questions, repertoire and name lookup;

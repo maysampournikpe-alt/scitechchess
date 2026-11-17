@@ -51,6 +51,14 @@ function Dashboard() {
         </div>
       )}
 
+      <Link href="/journey/" className="card mb-6 flex flex-wrap items-center justify-between gap-4 p-5 no-underline transition-colors hover:border-accent">
+        <div>
+          <h2 className="text-xl">Your journey</h2>
+          <p className="mt-1 text-muted">A level-by-level path to your goal: lessons, puzzles, videos and tests, ordered by what you need most.</p>
+        </div>
+        <span className="btn btn-primary">Open the path</span>
+      </Link>
+
       <div className="grid gap-6 xl:grid-cols-[1.5fr_1fr]">
         <section aria-labelledby="today" className="card p-5">
           <div className="flex flex-wrap items-baseline justify-between gap-2">

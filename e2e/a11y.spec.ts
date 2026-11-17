@@ -3,7 +3,7 @@ import AxeBuilder from "@axe-core/playwright";
 import { onboard } from "./helpers";
 
 // WCAG 2.x A and AA rules, checked by axe-core on each main page after it has loaded.
-const PAGES = ["/", "/onboarding/", "/train/", "/puzzles/", "/openings/", "/openings/?id=italian", "/middlegame/?id=carlsbad-minority", "/endgames/", "/endgames/?id=lucena", "/calculation/", "/vision/", "/blunder-check/", "/play/", "/analysis/", "/games/?id=opera", "/progress/", "/mistakes/", "/coach/", "/videos/", "/tournament/", "/settings/"];
+const PAGES = ["/", "/onboarding/", "/train/", "/journey/", "/journey/?step=f-mates-l", "/journey/?test=to-1200", "/puzzles/", "/openings/", "/openings/?id=italian", "/middlegame/?id=carlsbad-minority", "/endgames/", "/endgames/?id=lucena", "/calculation/", "/vision/", "/blunder-check/", "/play/", "/analysis/", "/games/?id=opera", "/progress/", "/mistakes/", "/coach/", "/videos/", "/tournament/", "/settings/"];
 
 for (const theme of ["dark", "light"] as const) {
   test(`no WCAG A/AA violations (${theme} theme)`, async ({ page }) => {

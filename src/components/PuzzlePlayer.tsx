@@ -23,6 +23,8 @@ type Props = {
   onDone?: (outcome: Attempt["outcome"]) => void;
   nextLabel?: string;
   onNext?: () => void;
+  /** Journey step or checkpoint this attempt belongs to. */
+  context?: string;
 };
 
 const region = (square: string) => {
@@ -32,7 +34,7 @@ const region = (square: string) => {
   return `${side}, around rank ${rank}`;
 };
 
-export function PuzzlePlayer({ puzzle, theme, module = "puzzle", strict, onDone, nextLabel = "Next puzzle", onNext }: Props) {
+export function PuzzlePlayer({ puzzle, theme, module = "puzzle", strict, onDone, nextLabel = "Next puzzle", onNext, context }: Props) {
   const record = useStore((s) => s.record);
   const run = useMemo(() => new PuzzleRun(puzzle), [puzzle]);
   const [fen, setFen] = useState(run.fen);
@@ -77,6 +79,7 @@ export function PuzzlePlayer({ puzzle, theme, module = "puzzle", strict, onDone,
       outcome,
       hints,
       ms: Date.now() - started.current,
+      context,
       card: { label: `${themeLabel} puzzle (${puzzle.rating})`, href: `/puzzles/?id=${puzzle.id}&r=${puzzle.rating}`, kind: "puzzle" },
     });
     onDone?.(outcome);

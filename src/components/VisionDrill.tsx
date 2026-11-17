@@ -5,7 +5,7 @@ import { Feedback } from "./ui";
 import type { Drill } from "@/lib/learning/vision";
 import { useStore } from "@/lib/store/store";
 
-export function VisionDrill({ drill, assessment, onDone, onNext }: { drill: Drill; assessment?: boolean; onDone?: (ok: boolean) => void; onNext?: () => void }) {
+export function VisionDrill({ drill, assessment, onDone, onNext, context }: { drill: Drill; assessment?: boolean; onDone?: (ok: boolean) => void; onNext?: () => void; context?: string }) {
   const record = useStore((s) => s.record);
   const [picked, setPicked] = useState<string | null>(null);
   const [hidden, setHidden] = useState(false);
@@ -23,7 +23,7 @@ export function VisionDrill({ drill, assessment, onDone, onNext }: { drill: Dril
     if (picked) return;
     setPicked(o);
     const ok = o === drill.answer;
-    record({ itemId: `vision:${drill.id}`, module: assessment ? "assessment" : "vision", skill: "visualization", concept: `vision:${drill.kind}`, difficulty: drill.difficulty, itemRd: 150, outcome: ok ? "solo" : "failed", hints: 0, ms: Date.now() - started.current, noCard: true });
+    record({ itemId: `vision:${drill.id}`, module: assessment ? "assessment" : "vision", skill: "visualization", concept: `vision:${drill.kind}`, difficulty: drill.difficulty, itemRd: 150, outcome: ok ? "solo" : "failed", hints: 0, ms: Date.now() - started.current, noCard: true, context });
     onDone?.(ok);
   }
 

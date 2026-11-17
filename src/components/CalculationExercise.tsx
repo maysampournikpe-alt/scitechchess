@@ -7,7 +7,7 @@ import { mainTheme } from "@/lib/learning/select";
 import { useStore } from "@/lib/store/store";
 
 /** The whole line is written down before any piece moves: this trains calculation, not recognition. */
-export function CalculationExercise({ puzzle, assessment, onDone, onNext }: { puzzle: Puzzle; assessment?: boolean; onDone?: (solo: boolean) => void; onNext?: () => void }) {
+export function CalculationExercise({ puzzle, assessment, onDone, onNext, context }: { puzzle: Puzzle; assessment?: boolean; onDone?: (solo: boolean) => void; onNext?: () => void; context?: string }) {
   const record = useStore((s) => s.record);
   const run = new PuzzleRun(puzzle);
   const [text, setText] = useState("");
@@ -35,6 +35,7 @@ export function CalculationExercise({ puzzle, assessment, onDone, onNext }: { pu
       outcome: solo ? "solo" : "failed",
       hints: 0,
       ms: Date.now() - started.current,
+      context,
       card: { label: `Calculation line (${puzzle.rating})`, href: "/calculation/", kind: "puzzle" },
     });
     onDone?.(solo);

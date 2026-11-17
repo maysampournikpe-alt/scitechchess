@@ -3,37 +3,12 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { PageHeader } from "@/components/ui";
 import { CHANNELS, VIDEO_TOPICS } from "@/content/videos";
-
-type Verified = { youtubeId: string; topic: string; practiceHref: string; level: string; title: string; channel: string; verifiedAt: string };
-
-/** A click-to-load player: nothing is requested from YouTube until the learner presses play. */
-function Player({ v }: { v: Verified }) {
-  const [on, setOn] = useState(false);
-  return (
-    <div className="aspect-video w-full overflow-hidden rounded-lg bg-raised">
-      {on ? (
-        <iframe
-          className="h-full w-full"
-          src={`https://www.youtube-nocookie.com/embed/${v.youtubeId}?autoplay=1`}
-          title={`${v.title} (${v.channel})`}
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowFullScreen
-        />
-      ) : (
-        <button className="grid h-full w-full place-items-center text-center" onClick={() => setOn(true)} aria-label={`Play video: ${v.title}`}>
-          <span className="btn btn-primary">Play video</span>
-        </button>
-      )}
-    </div>
-  );
-}
+import { loadVideos, Player, type Verified } from "@/components/VideoPlayer";
 
 export default function VideosPage() {
   const [videos, setVideos] = useState<Verified[] | null>(null);
   useEffect(() => {
-    fetch(`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/data/videos.json`)
-      .then((r) => (r.ok ? r.json() : []))
-      .then(setVideos, () => setVideos([]));
+    loadVideos().then(setVideos, () => setVideos([]));
   }, []);
   const topics = [...new Set((videos ?? []).map((v) => v.topic))];
 

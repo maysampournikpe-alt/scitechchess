@@ -1,6 +1,6 @@
 # ChessMastery AI
 
-A free chess training site that adapts to the learner: an assessment, a daily plan built from
+A free chess training site that adapts to the learner: a level-by-level journey to your goal rating, an assessment, a daily plan built from
 measured results, adaptive puzzles, opening, middlegame and endgame lessons with real board
 practice, games against Stockfish with move-by-move review, and spaced review of every mistake.
 
@@ -15,9 +15,9 @@ npm run dev        # http://localhost:3000
 ```
 
 ```bash
-npm test           # 116 unit, content and engine tests (Vitest)
+npm test           # 140 unit, content and engine tests (Vitest)
 npm run build      # static site in out/
-npm run e2e        # 28 browser tests on desktop and phone (Playwright), after a build
+npm run e2e        # 38 browser tests on desktop and phone (Playwright), after a build
 ```
 
 `out/` can be served by any static host (GitHub Pages, Cloudflare Pages, Netlify). The

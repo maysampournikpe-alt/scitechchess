@@ -46,9 +46,9 @@ export const LEVELS: Level[] = [
       leaveWhen: "Pass the checkpoint: solve at least 6 of 8 puzzles rated around 800 with no help.",
     },
     units: [
-      { id: "f-mates", title: "Checkmate patterns", skill: "tactics", goalTags: ["tactics"], nodes: [{ kind: "lesson", id: "f-mates-l", lesson: "mate-basics" }, P("f-mates-p", "Mate in one", "mateIn1"), { kind: "endgame", id: "f-mates-e1", endgame: "two-rooks-mate" }, { kind: "endgame", id: "f-mates-e2", endgame: "queen-mate" }] },
+      { id: "f-mates", title: "Checkmate patterns", skill: "tactics", goalTags: ["tactics"], nodes: [{ kind: "lesson", id: "f-mates-l", lesson: "mate-basics" }, { kind: "video", id: "f-mates-v", topic: "Checkmate patterns" }, P("f-mates-p", "Mate in one", "mateIn1"), { kind: "endgame", id: "f-mates-e1", endgame: "two-rooks-mate" }, { kind: "endgame", id: "f-mates-e2", endgame: "queen-mate" }] },
       { id: "f-safety", title: "Keep your pieces", skill: "decisions", goalTags: ["tactics"], nodes: [{ kind: "lesson", id: "f-safety-l", lesson: "piece-safety" }, { kind: "video", id: "f-safety-v", topic: "Forks, pins and skewers" }, P("f-safety-p", "Hanging pieces", "hangingPiece"), { kind: "drill", id: "f-safety-d", title: "Board vision: loose pieces", drill: "vision", need: 8 }, { kind: "drill", id: "f-safety-b", title: "Blunder check", drill: "blunder", need: 4 }] },
-      { id: "f-opening", title: "Starting the game well", skill: "openingUnderstanding", goalTags: ["openings"], nodes: [{ kind: "lesson", id: "f-opening-l", lesson: "opening-principles" }, { kind: "opening", id: "f-opening-o", slot: "white" }] },
+      { id: "f-opening", title: "Starting the game well", skill: "openingUnderstanding", goalTags: ["openings"], nodes: [{ kind: "lesson", id: "f-opening-l", lesson: "opening-principles" }, { kind: "video", id: "f-opening-v", topic: "Opening principles" }, { kind: "opening", id: "f-opening-o", slot: "white" }] },
     ],
   },
   {
@@ -82,7 +82,7 @@ export const LEVELS: Level[] = [
       leaveWhen: "Pass the checkpoint: 6 of 8 puzzles around 1200 without help.",
     },
     units: [
-      { id: "k12-disc", title: "Discovered attacks", skill: "tactics", goalTags: ["tactics"], nodes: [{ kind: "lesson", id: "k12-disc-l", lesson: "discovered-attacks" }, P("k12-disc-p", "Discovered attacks", "discoveredAttack"), P("k12-dbl-p", "Double checks", "doubleCheck", 6, 4)] },
+      { id: "k12-disc", title: "Discovered attacks", skill: "tactics", goalTags: ["tactics"], nodes: [{ kind: "lesson", id: "k12-disc-l", lesson: "discovered-attacks" }, { kind: "video", id: "k12-disc-v", topic: "Discovered attacks" }, P("k12-disc-p", "Discovered attacks", "discoveredAttack"), P("k12-dbl-p", "Double checks", "doubleCheck", 6, 4)] },
       { id: "k12-calc", title: "Thinking routine", skill: "calculation", goalTags: ["tactics", "tournament"], nodes: [{ kind: "lesson", id: "k12-calc-l", lesson: "candidate-moves" }, { kind: "video", id: "k12-calc-v", topic: "Calculation" }, P("k12-m2-p", "Mate in two", "mateIn2"), { kind: "drill", id: "k12-calc-d", title: "Calculate whole lines", drill: "calculation", need: 3 }] },
       { id: "k12-opp", title: "The opposition", skill: "endgameKnowledge", goalTags: ["endgame"], nodes: [{ kind: "endgame", id: "k12-opp-e1", endgame: "opposition-defence" }, { kind: "endgame", id: "k12-opp-e2", endgame: "spare-tempo" }] },
       { id: "k12-rep", title: "Your first repertoire", skill: "openingKnowledge", goalTags: ["openings"], nodes: [{ kind: "opening", id: "k12-rep-w", slot: "white" }, { kind: "opening", id: "k12-rep-e4", slot: "vsE4" }, { kind: "opening", id: "k12-rep-d4", slot: "vsD4" }] },
@@ -101,7 +101,7 @@ export const LEVELS: Level[] = [
       leaveWhen: "Pass the checkpoint: 6 of 8 puzzles around 1400 without help.",
     },
     units: [
-      { id: "k14-defl", title: "Defenders under attack", skill: "tactics", goalTags: ["tactics"], nodes: [{ kind: "lesson", id: "k14-defl-l", lesson: "deflection-decoy" }, P("k14-defl-p", "Deflection", "deflection"), P("k14-attr-p", "Decoys", "attraction", 6, 4), P("k14-cap-p", "Removing the defender", "capturingDefender", 6, 4)] },
+      { id: "k14-defl", title: "Defenders under attack", skill: "tactics", goalTags: ["tactics"], nodes: [{ kind: "lesson", id: "k14-defl-l", lesson: "deflection-decoy" }, { kind: "video", id: "k14-defl-v", topic: "Deflection and removing the defender" }, P("k14-defl-p", "Deflection", "deflection"), P("k14-attr-p", "Decoys", "attraction", 6, 4), P("k14-cap-p", "Removing the defender", "capturingDefender", 6, 4)] },
       { id: "k14-calc", title: "Three moves deep", skill: "calculation", goalTags: ["tactics", "tournament"], nodes: [{ kind: "drill", id: "k14-calc-d", title: "Calculate whole lines", drill: "calculation", need: 4 }, { kind: "drill", id: "k14-blunder-d", title: "Blunder check", drill: "blunder", need: 5 }] },
       { id: "k14-struct", title: "Pawn structure", skill: "planning", goalTags: ["positional"], nodes: [{ kind: "lesson", id: "k14-struct-l", lesson: "pawn-structure" }, { kind: "video", id: "k14-struct-v", topic: "Isolated queen's pawn" }, { kind: "plan", id: "k14-struct-plan", plan: "iqp-activity" }, { kind: "game", id: "k14-opera", game: "opera" }] },
       { id: "k14-end", title: "Pawn breakthroughs", skill: "endgameKnowledge", goalTags: ["endgame"], nodes: [{ kind: "endgame", id: "k14-end-e", endgame: "breakthrough" }, P("k14-pawnend-p", "Pawn endgames", "pawnEndgame", 6, 4)] },
@@ -120,7 +120,7 @@ export const LEVELS: Level[] = [
       leaveWhen: "Pass the checkpoint: 6 of 8 puzzles around 1600 without help.",
     },
     units: [
-      { id: "k16-quiet", title: "In-between and quiet moves", skill: "tactics", goalTags: ["tactics"], nodes: [{ kind: "lesson", id: "k16-quiet-l", lesson: "quiet-moves" }, P("k16-inter-p", "Zwischenzug", "intermezzo", 6, 4), P("k16-quiet-p", "Quiet moves", "quietMove", 6, 4)] },
+      { id: "k16-quiet", title: "In-between and quiet moves", skill: "tactics", goalTags: ["tactics"], nodes: [{ kind: "lesson", id: "k16-quiet-l", lesson: "quiet-moves" }, { kind: "video", id: "k16-quiet-v", topic: "In-between moves" }, P("k16-inter-p", "Zwischenzug", "intermezzo", 6, 4), P("k16-quiet-p", "Quiet moves", "quietMove", 6, 4)] },
       { id: "k16-rook", title: "Rook endgames", skill: "endgameKnowledge", goalTags: ["endgame"], nodes: [{ kind: "endgame", id: "k16-rook-luc", endgame: "lucena" }, { kind: "endgame", id: "k16-rook-phil", endgame: "philidor" }, { kind: "video", id: "k16-rook-v", topic: "Lucena and Philidor" }, P("k16-rook-p", "Rook endgames", "rookEndgame", 6, 4)] },
       { id: "k16-plans", title: "Plans from the opening", skill: "planning", goalTags: ["positional", "openings"], nodes: [{ kind: "plan", id: "k16-plan-c", plan: "carlsbad-minority" }, { kind: "video", id: "k16-plans-v", topic: "Minority attack" }, { kind: "plan", id: "k16-plan-f", plan: "french-chain" }] },
       { id: "k16-def", title: "Defence", skill: "defense", goalTags: ["tactics", "tournament"], nodes: [P("k16-def-p", "Defensive moves", "defensiveMove"), { kind: "game", id: "k16-reti", game: "reti-tartakower" }] },
@@ -140,8 +140,8 @@ export const LEVELS: Level[] = [
     },
     units: [
       { id: "k18-combo", title: "Longer combinations", skill: "calculation", goalTags: ["tactics"], nodes: [P("k18-long-p", "Long combinations", "long"), P("k18-sac-p", "Sacrifices", "sacrifice"), { kind: "game", id: "k18-immortal", game: "immortal" }] },
-      { id: "k18-pieces", title: "Good and bad pieces", skill: "evaluation", goalTags: ["positional"], nodes: [{ kind: "lesson", id: "k18-pieces-l", lesson: "good-bad-pieces" }, { kind: "plan", id: "k18-plan-sv", plan: "sveshnikov-outpost" }, { kind: "plan", id: "k18-plan-st", plan: "stonewall-bishops" }] },
-      { id: "k18-attack", title: "Attacking the king", skill: "planning", goalTags: ["positional", "tactics"], nodes: [{ kind: "lesson", id: "k18-attack-l", lesson: "opposite-castling" }, { kind: "plan", id: "k18-plan-oc", plan: "dragon-opposite-castling" }, P("k18-ks-p", "Kingside attacks", "kingsideAttack")] },
+      { id: "k18-pieces", title: "Good and bad pieces", skill: "evaluation", goalTags: ["positional"], nodes: [{ kind: "lesson", id: "k18-pieces-l", lesson: "good-bad-pieces" }, { kind: "video", id: "k18-pieces-v", topic: "Good and bad pieces" }, { kind: "plan", id: "k18-plan-sv", plan: "sveshnikov-outpost" }, { kind: "plan", id: "k18-plan-st", plan: "stonewall-bishops" }] },
+      { id: "k18-attack", title: "Attacking the king", skill: "planning", goalTags: ["positional", "tactics"], nodes: [{ kind: "lesson", id: "k18-attack-l", lesson: "opposite-castling" }, { kind: "video", id: "k18-attack-v", topic: "Attacking the king" }, { kind: "plan", id: "k18-plan-oc", plan: "dragon-opposite-castling" }, P("k18-ks-p", "Kingside attacks", "kingsideAttack")] },
       { id: "k18-convert", title: "Converting", skill: "endgameConversion", goalTags: ["endgame", "tournament"], nodes: [{ kind: "drill", id: "k18-conv-d", title: "Convert a winning position", drill: "conversion", need: 2 }] },
     ],
   },
