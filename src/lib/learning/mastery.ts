@@ -15,6 +15,8 @@ export type Attempt = {
   ms: number;
   /** True the first time this person ever saw this item. */
   firstSeen: boolean;
+  /** Where the attempt happened, e.g. a journey step id or "checkpoint:to-1200". */
+  context?: string;
 };
 
 export type MasteryState = "not_started" | "introduced" | "practicing" | "demonstrated" | "retention_verified" | "needs_review";

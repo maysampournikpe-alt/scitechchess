@@ -177,7 +177,7 @@ export const useStore = create<State & Actions>()(
           // Every record must have the fields the pages read; a damaged file is refused as a whole.
           const num = (v: unknown) => typeof v === "number" && Number.isFinite(v);
           const str = (v: unknown) => typeof v === "string";
-          const okAttempt = (a: Attempt) => a && num(a.t) && str(a.itemId) && str(a.skill) && str(a.concept) && num(a.difficulty) && ["solo", "assisted", "failed"].includes(a.outcome) && num(a.hints) && num(a.ms) && typeof a.firstSeen === "boolean";
+          const okAttempt = (a: Attempt) => a && num(a.t) && str(a.itemId) && str(a.skill) && str(a.concept) && num(a.difficulty) && ["solo", "assisted", "failed"].includes(a.outcome) && num(a.hints) && num(a.ms) && typeof a.firstSeen === "boolean" && (a.context === undefined || str(a.context));
           const okSkill = (k: SkillState) => k && num(k.score) && num(k.rd) && k.rd > 0 && num(k.n) && Array.isArray(k.history);
           const okCard = (c: Card) => c && str(c.id) && str(c.label) && str(c.href) && c.href.startsWith("/") && num(c.due) && num(c.interval) && num(c.ease);
           if (!d.attempts.every(okAttempt)) return false;
