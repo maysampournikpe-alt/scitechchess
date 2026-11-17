@@ -1,24 +1,26 @@
-// Builds public/data/puzzles.json from the full Lichess puzzle database (CC0).
+// Builds public/data/puzzles/ (one file per 100-point rating band, plus index.json) from the
+// full Lichess puzzle database (CC0).
 //
 // Run with PUZZLES_DOWNLOAD=1 (on a machine or build with internet access). It streams the ~250 MB
 // compressed CSV, keeps well-rated puzzles (popular, often played, stable rating), picks a
 // reproducible spread across ratings and themes, and checks every kept puzzle with chess.js.
 // If anything fails (no network, bad data), the committed file is left untouched and the
 // build continues: the app always has a valid puzzle set.
-import { readFileSync, renameSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { Readable } from "node:stream";
 import { Decompress } from "fzstd";
 import { Chess } from "chess.js";
 
 const SOURCE = "https://database.lichess.org/lichess_db_puzzle.csv.zst";
-const OUT = new URL("../public/data/puzzles.json", import.meta.url);
-const PER_BAND = Number(process.env.PUZZLES_PER_BAND ?? 600); // 100-point rating bands
-const MIN_PER_THEME = 150;
+const OUT = new URL("../public/data/puzzles/", import.meta.url);
+const PER_BAND = Number(process.env.PUZZLES_PER_BAND ?? 2000); // 100-point rating bands
+const MIN_PER_THEME = 400;
 // Themes the trainer offers by name (src/lib/learning/select.ts): make sure each has enough puzzles.
 const THEMES = readFileSync(new URL("../src/lib/learning/select.ts", import.meta.url), "utf8").match(/id: "(\w+)"/g).map((m) => m.slice(5, -1));
 
 // Manual only: the import takes about 7 minutes, too long for every deploy. The result is committed.
-const enabled = process.env.PUZZLES_DOWNLOAD === "1";
+// Also runs on a Vercel build of the branch "refresh-puzzles", which has internet access.
+const enabled = process.env.PUZZLES_DOWNLOAD === "1" || process.env.VERCEL_GIT_COMMIT_REF === "refresh-puzzles";
 if (!enabled) {
   console.log("[puzzles] skipped: set PUZZLES_DOWNLOAD=1 to rebuild from the Lichess database");
   process.exit(0);
@@ -100,8 +102,19 @@ async function main() {
   for (const l of [...bands.values(), ...themes.values()]) for (const p of l.trim()) picked.set(p[0], p);
   const out = [...picked.values()].filter((p) => valid(p[1], p[2], p[4])).sort((a, b) => a[3] - b[3] || (a[0] < b[0] ? -1 : 1)).map((p) => [p[0], p[1], p[2], p[3], p[4]]);
   if (out.length < 5000) throw new Error(`only ${out.length} puzzles passed; keeping the committed set`);
-  const tmp = OUT.pathname + ".tmp";
-  writeFileSync(tmp, JSON.stringify(out));
+  // Write to a temporary folder first, then swap, so a failure never leaves a half-written set.
+  const tmp = new URL("../public/data/puzzles.tmp/", import.meta.url);
+  rmSync(tmp, { recursive: true, force: true });
+  mkdirSync(tmp);
+  const byBand = new Map();
+  for (const p of out) {
+    const b = Math.floor(p[3] / 100);
+    if (!byBand.has(b)) byBand.set(b, []);
+    byBand.get(b).push(p);
+  }
+  for (const [b, list] of byBand) writeFileSync(new URL(`b${b}.json`, tmp), JSON.stringify(list));
+  writeFileSync(new URL("index.json", tmp), JSON.stringify({ bands: Object.fromEntries([...byBand].sort((a, b) => a[0] - b[0]).map(([b, l]) => [b, l.length])) }));
+  rmSync(OUT, { recursive: true, force: true });
   renameSync(tmp, OUT);
   console.log(`[puzzles] wrote ${out.length} puzzles (${bands.size} rating bands)`);
   console.log(`[puzzles] per theme: ${THEMES.map((t) => `${t}=${out.filter((p) => p[4].split(" ").includes(t)).length}`).join(" ")}`);

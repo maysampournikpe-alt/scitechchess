@@ -77,7 +77,7 @@ export function PuzzlePlayer({ puzzle, theme, module = "puzzle", strict, onDone,
       outcome,
       hints,
       ms: Date.now() - started.current,
-      card: { label: `${themeLabel} puzzle (${puzzle.rating})`, href: `/puzzles/?id=${puzzle.id}`, kind: "puzzle" },
+      card: { label: `${themeLabel} puzzle (${puzzle.rating})`, href: `/puzzles/?id=${puzzle.id}&r=${puzzle.rating}`, kind: "puzzle" },
     });
     onDone?.(outcome);
   }

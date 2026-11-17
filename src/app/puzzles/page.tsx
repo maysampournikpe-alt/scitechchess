@@ -21,9 +21,13 @@ function Trainer() {
   const [puzzle, setPuzzle] = useState<Puzzle | null>(null);
   const [session, setSession] = useState({ done: 0, solo: 0, streak: 0, best: 0 });
 
+  const r = Number(params.get("r")) || undefined;
   useEffect(() => {
-    loadPuzzles().then(setAll, (e) => setError(String(e.message ?? e)));
-  }, []);
+    const s = useStore.getState().skills[THEME_BY_ID[theme]?.skill ?? "tactics"].score;
+    const center = id ? r : mode === "warmup" ? s - 250 : mode === "hard" ? s + 200 : s;
+    // A themed set needs a wider rating range to find enough puzzles of that theme.
+    loadPuzzles(center, id ? 50 : theme ? 900 : 450).then(setAll, (e) => setError(String(e.message ?? e)));
+  }, [id, r, theme, mode]);
 
   const skillId = THEME_BY_ID[theme]?.skill ?? "tactics";
   const next = useCallback(() => {

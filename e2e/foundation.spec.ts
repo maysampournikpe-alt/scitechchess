@@ -36,9 +36,9 @@ test("onboarding validates input, saves the profile, and the dashboard explains 
 
 test("puzzle: wrong move is rejected with an explanation, the solution is accepted, and a review is scheduled", async ({ page }) => {
   await onboard(page);
-  const [id, , moves] = puzzles.find((p) => p[2].split(" ").length === 4 && !p[4].includes("mate"))!;
+  const [id, , moves, rating] = puzzles.find((p) => p[2].split(" ").length === 4 && !p[4].includes("mate"))!;
   const [, m1, , m2] = moves.split(" ");
-  await page.goto(`/puzzles/?id=${id}`);
+  await page.goto(`/puzzles/?id=${id}&r=${rating}`);
   await expect(page.getByRole("heading", { name: /to move/ })).toBeVisible();
   const orientation = (await page.getByRole("heading", { name: /to move/ }).textContent())!.startsWith("White") ? "w" : "b";
 

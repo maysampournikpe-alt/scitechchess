@@ -20,7 +20,7 @@ function Vision() {
   const [tally, setTally] = useState({ n: 0, ok: 0 });
   const vis = useStore((s) => s.skills.visualization);
   useEffect(() => {
-    loadPuzzles().then((ps) => setFens(ps.map((p) => p.fen)), () => setFens([]));
+    loadPuzzles(1300, 100).then((ps) => setFens(ps.map((p) => p.fen)), () => setFens([]));
   }, []);
   const next = useCallback(() => {
     if ((kind === "defended" || kind === "memory") && fens.length === 0) return setDrill(null);

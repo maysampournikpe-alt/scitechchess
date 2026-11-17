@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { readFileSync } from "node:fs";
+import { allPuzzleRows } from "./puzzle-data";
 import { Chess } from "chess.js";
 import { fromRow, PuzzleRun, solutionSan, type PuzzleRow } from "@/lib/chess/puzzle";
 import { applyUci } from "@/lib/chess/rules";
 
-const rows: PuzzleRow[] = JSON.parse(readFileSync("public/data/puzzles.json", "utf8"));
+const rows: PuzzleRow[] = allPuzzleRows();
 const puzzles = rows.map(fromRow);
 
 describe("shipped puzzle set", () => {

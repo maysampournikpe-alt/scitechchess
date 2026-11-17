@@ -45,7 +45,7 @@ export function BlunderCheck({ puzzle, onNext }: { puzzle: Puzzle; onNext: () =>
     if (g.bestUci && bad) text.push(`A safe move was ${applyUci(new Chess(puzzle.fen), g.bestUci)?.san}.`);
     setResult({ ok: !bad, text });
     setBusy(false);
-    record({ itemId: `blunder:${puzzle.id}`, module: "puzzle", skill: "decisions", concept: "blunder-check", difficulty: Math.max(600, puzzle.rating - 200), itemRd: 150, outcome: bad ? "failed" : showScan ? "assisted" : "solo", hints: showScan ? 1 : 0, ms: Date.now() - started.current, card: { label: "Blunder check", href: `/blunder-check/?id=${puzzle.id}`, kind: "puzzle" } });
+    record({ itemId: `blunder:${puzzle.id}`, module: "puzzle", skill: "decisions", concept: "blunder-check", difficulty: Math.max(600, puzzle.rating - 200), itemRd: 150, outcome: bad ? "failed" : showScan ? "assisted" : "solo", hints: showScan ? 1 : 0, ms: Date.now() - started.current, card: { label: "Blunder check", href: `/blunder-check/?id=${puzzle.id}&r=${puzzle.rating}`, kind: "puzzle" } });
   }
 
   return (

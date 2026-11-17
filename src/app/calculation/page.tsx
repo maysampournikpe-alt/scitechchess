@@ -12,7 +12,7 @@ function Calc() {
   const [p, setP] = useState<Puzzle | null>(null);
   const [err, setErr] = useState("");
   useEffect(() => {
-    loadPuzzles().then(setAll, (e) => setErr(String(e.message ?? e)));
+    loadPuzzles(useStore.getState().skills.calculation.score, 450).then(setAll, (e) => setErr(String(e.message ?? e)));
   }, []);
   const next = useCallback(() => {
     if (!all) return;

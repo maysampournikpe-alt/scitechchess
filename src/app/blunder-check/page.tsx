@@ -9,12 +9,14 @@ import { pickPuzzle } from "@/lib/learning/select";
 import { useStore } from "@/lib/store/store";
 
 function Trainer() {
-  const id = useSearchParams().get("id");
+  const params = useSearchParams();
+  const id = params.get("id");
+  const r = Number(params.get("r")) || undefined;
   const [all, setAll] = useState<Puzzle[] | null>(null);
   const [p, setP] = useState<Puzzle | null>(null);
   useEffect(() => {
-    loadPuzzles().then(setAll, () => setAll([]));
-  }, []);
+    loadPuzzles(id ? r : useStore.getState().skills.decisions.score + 200, id ? 50 : 450).then(setAll, () => setAll([]));
+  }, [id, r]);
   const next = useCallback(() => {
     if (!all) return;
     const s = useStore.getState();

@@ -52,7 +52,8 @@ function Assessment() {
   );
 
   useEffect(() => {
-    loadPuzzles().then(setAll, () => setAll([]));
+    // Adaptive tactics can move far from the starting estimate, so load a wide range.
+    loadPuzzles(useStore.getState().skills.tactics.score, 900).then(setAll, () => setAll([]));
   }, []);
 
   useEffect(() => {

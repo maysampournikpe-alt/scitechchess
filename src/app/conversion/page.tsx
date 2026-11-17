@@ -31,7 +31,7 @@ function Conversion() {
   const [i, setI] = useState(0);
   const rating = useStore((s) => s.skills.endgameConversion.score);
   useEffect(() => {
-    loadPuzzles().then(setAll, () => setAll([]));
+    loadPuzzles(useStore.getState().skills.endgameConversion.score, 700).then(setAll, () => setAll([]));
   }, []);
   const pool = useMemo(() => (all ?? []).map((p) => ({ p, w: wonPosition(p) })).filter((x) => x.w).sort((a, b) => Math.abs(a.p.rating - rating) - Math.abs(b.p.rating - rating)).slice(0, 60), [all, rating]);
   const pick = useCallback(() => setI(Math.floor(Math.random() * Math.max(1, pool.length))), [pool.length]);

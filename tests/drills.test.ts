@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { readFileSync } from "node:fs";
+import { allPuzzleRows } from "./puzzle-data";
 import { Chess } from "chess.js";
 import { checkCalculation, fromRow, solutionSan, type PuzzleRow } from "@/lib/chess/puzzle";
 import { knightMoves, makeDrill, squareColor } from "@/lib/learning/vision";
 
-const puzzles = (JSON.parse(readFileSync("public/data/puzzles.json", "utf8")) as PuzzleRow[]).map(fromRow);
+const puzzles = allPuzzleRows().map(fromRow);
 
 describe("calculation mode", () => {
   const p = puzzles.find((x) => x.moves.length === 6)!;

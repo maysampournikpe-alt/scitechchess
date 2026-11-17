@@ -1,8 +1,10 @@
 import { expect, type Locator, type Page } from "@playwright/test";
-import { readFileSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
 
 export type Row = [string, string, string, number, string];
-export const puzzles: Row[] = JSON.parse(readFileSync("public/data/puzzles.json", "utf8"));
+export const puzzles: Row[] = readdirSync("public/data/puzzles")
+  .filter((f) => /^b\d+\.json$/.test(f))
+  .flatMap((f) => JSON.parse(readFileSync(`public/data/puzzles/${f}`, "utf8")) as Row[]);
 
 /** Click a square on a chessground board. `orientation` is the colour at the bottom. */
 export async function clickSquare(board: Locator, square: string, orientation: "w" | "b" = "w") {
