@@ -87,6 +87,7 @@ describe("lesson move answers, checked with Stockfish", () => {
           const m = applyText(c, san);
           expect(m, `${l.id}: ${san}`).not.toBeNull();
           if (q.mate) expect(c.isCheckmate(), `${san} should mate`).toBe(true);
+          else if (q.rule) continue; // rules question: legality is what is being taught
           else {
             const g = await gradeMove(client, q.fen, m!.from + m!.to + (m!.promotion ?? ""), 16);
             expect(["best", "excellent"], `${l.id}: ${san} is ${g.judgement.quality}`).toContain(g.judgement.quality);
@@ -106,7 +107,8 @@ describe("journey engine", () => {
   it("places the learner by measured level and points the goal at the right level", () => {
     expect(LEVELS[levelIndexFor(650)].id).toBe("foundations");
     expect(LEVELS[levelIndexFor(1250)].id).toBe("to-1400");
-    expect(LEVELS[levelIndexFor(3000)].id).toBe("to-2200");
+    expect(LEVELS[levelIndexFor(3000)].id).toBe("to-2600");
+    expect(LEVELS[levelIndexFor(400)].id).toBe("first-steps");
     expect(LEVELS[goalIndex(profile(), 0)].id).toBe("to-2000");
     expect(LEVELS[goalIndex(profile({ goalRating: 1500 }), 0)].id).toBe("to-1600");
     const j = buildJourney(input());
@@ -141,13 +143,19 @@ describe("journey engine", () => {
     expect(j.levels[j.currentIndex].units[0].unit.skill).toBe("endgameKnowledge");
     expect(j.levels[j.currentIndex].units[0].focus).toBe(true);
   });
+  it("keeps the rules in teaching order for a complete beginner", () => {
+    const j = buildJourney(input({ skills: skills(400), profile: profile({ experience: "beginner", goalRating: 1200 }) }));
+    expect(j.levels[j.currentIndex].level.id).toBe("first-steps");
+    expect(j.levels[j.currentIndex].units.map((u) => u.unit.id)).toEqual(["s-rules", "s-check", "s-special"]);
+    expect(j.next?.node.node.id).toBe("s-rules-l");
+  });
   it("a passed checkpoint completes the level and moves the learner on; a failed one does not", () => {
     const sitting = (solo: number) => Array.from({ length: 8 }, (_, i) => att({ itemId: `p${i}${solo}`, context: "checkpoint:to-1200", outcome: i < solo ? "solo" : "failed" }));
     expect(checkpointPassed(sitting(5), "to-1200")).toBe(false);
     expect(checkpointPassed(sitting(6), "to-1200")).toBe(true);
     const j = buildJourney(input({ attempts: sitting(6) }));
     expect(LEVELS[j.currentIndex].id).toBe("to-1400");
-    expect(j.levels[2].status).toBe("passed");
+    expect(j.levels.find((l) => l.level.id === "to-1200")!.status).toBe("passed");
   });
   it("a video step with no checked video is skipped instead of blocking the path", () => {
     const j = buildJourney(input({ videoTopics: new Set() }));

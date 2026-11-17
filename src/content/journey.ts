@@ -28,15 +28,36 @@ export type Level = {
   to: number;
   guide: { summary: string; focus: string[]; habits: string[]; mistakes: string[]; leaveWhen: string };
   units: Unit[];
+  /** Keep the units in the authored order (they build on each other) instead of ordering by need. */
+  ordered?: boolean;
 };
 
 const P = (id: string, title: string, theme: string | undefined, count = 8, need = 6): JourneyNode => ({ kind: "puzzles", id, title, theme, count, need });
 
 export const LEVELS: Level[] = [
   {
+    id: "first-steps",
+    title: "First steps",
+    from: 0,
+    to: 600,
+    ordered: true,
+    guide: {
+      summary: "Everything starts with the rules: how each piece moves and captures, what check and checkmate mean, and the special moves. Once these are automatic, you can see the board clearly and start winning material.",
+      focus: ["How every piece moves and captures", "Check, checkmate and stalemate", "Castling, en passant and promotion", "Mate in one"],
+      habits: ["Before each move, check whether your king is in check", "Look at every capture your pieces can make"],
+      mistakes: ["Moving into check (an illegal move)", "Stalemating the opponent when you are winning", "Forgetting that pawns capture diagonally"],
+      leaveWhen: "Pass the checkpoint: solve at least 6 of 8 puzzles rated around 600 with no help.",
+    },
+    units: [
+      { id: "s-rules", title: "The pieces", skill: "visualization", goalTags: ["learn"], nodes: [{ kind: "lesson", id: "s-rules-l", lesson: "how-pieces-move" }, { kind: "drill", id: "s-rules-d", title: "Board vision: loose pieces", drill: "vision", need: 6 }] },
+      { id: "s-check", title: "Check and checkmate", skill: "tactics", goalTags: ["learn"], nodes: [{ kind: "lesson", id: "s-check-l", lesson: "check-rules" }, { kind: "video", id: "s-check-v", topic: "Checkmate patterns" }, P("s-check-p", "Mate in one", "mateIn1", 6, 4)] },
+      { id: "s-special", title: "Special moves", skill: "openingUnderstanding", goalTags: ["learn"], nodes: [{ kind: "lesson", id: "s-special-l", lesson: "special-moves" }, { kind: "endgame", id: "s-special-e", endgame: "pawn-race" }] },
+    ],
+  },
+  {
     id: "foundations",
     title: "Foundations",
-    from: 0,
+    from: 600,
     to: 800,
     guide: {
       summary: "Games at this level are decided by pieces left unprotected and by missed one-move checkmates. The fastest way up is not openings or strategy, but a safety habit before every move and the basic mating patterns.",
@@ -84,7 +105,7 @@ export const LEVELS: Level[] = [
     units: [
       { id: "k12-disc", title: "Discovered attacks", skill: "tactics", goalTags: ["tactics"], nodes: [{ kind: "lesson", id: "k12-disc-l", lesson: "discovered-attacks" }, { kind: "video", id: "k12-disc-v", topic: "Discovered attacks" }, P("k12-disc-p", "Discovered attacks", "discoveredAttack"), P("k12-dbl-p", "Double checks", "doubleCheck", 6, 4)] },
       { id: "k12-calc", title: "Thinking routine", skill: "calculation", goalTags: ["tactics", "tournament"], nodes: [{ kind: "lesson", id: "k12-calc-l", lesson: "candidate-moves" }, { kind: "video", id: "k12-calc-v", topic: "Calculation" }, P("k12-m2-p", "Mate in two", "mateIn2"), { kind: "drill", id: "k12-calc-d", title: "Calculate whole lines", drill: "calculation", need: 3 }] },
-      { id: "k12-opp", title: "The opposition", skill: "endgameKnowledge", goalTags: ["endgame"], nodes: [{ kind: "endgame", id: "k12-opp-e1", endgame: "opposition-defence" }, { kind: "endgame", id: "k12-opp-e2", endgame: "spare-tempo" }] },
+      { id: "k12-opp", title: "The opposition", skill: "endgameKnowledge", goalTags: ["endgame"], nodes: [{ kind: "lesson", id: "k12-opp-l", lesson: "opposition" }, { kind: "endgame", id: "k12-opp-e1", endgame: "opposition-defence" }, { kind: "endgame", id: "k12-opp-e2", endgame: "spare-tempo" }] },
       { id: "k12-rep", title: "Your first repertoire", skill: "openingKnowledge", goalTags: ["openings"], nodes: [{ kind: "opening", id: "k12-rep-w", slot: "white" }, { kind: "opening", id: "k12-rep-e4", slot: "vsE4" }, { kind: "opening", id: "k12-rep-d4", slot: "vsD4" }] },
     ],
   },
@@ -121,9 +142,9 @@ export const LEVELS: Level[] = [
     },
     units: [
       { id: "k16-quiet", title: "In-between and quiet moves", skill: "tactics", goalTags: ["tactics"], nodes: [{ kind: "lesson", id: "k16-quiet-l", lesson: "quiet-moves" }, { kind: "video", id: "k16-quiet-v", topic: "In-between moves" }, P("k16-inter-p", "Zwischenzug", "intermezzo", 6, 4), P("k16-quiet-p", "Quiet moves", "quietMove", 6, 4)] },
-      { id: "k16-rook", title: "Rook endgames", skill: "endgameKnowledge", goalTags: ["endgame"], nodes: [{ kind: "endgame", id: "k16-rook-luc", endgame: "lucena" }, { kind: "endgame", id: "k16-rook-phil", endgame: "philidor" }, { kind: "video", id: "k16-rook-v", topic: "Lucena and Philidor" }, P("k16-rook-p", "Rook endgames", "rookEndgame", 6, 4)] },
+      { id: "k16-rook", title: "Rook endgames", skill: "endgameKnowledge", goalTags: ["endgame"], nodes: [{ kind: "lesson", id: "k16-rook-l", lesson: "rook-endgames" }, { kind: "endgame", id: "k16-rook-luc", endgame: "lucena" }, { kind: "endgame", id: "k16-rook-phil", endgame: "philidor" }, { kind: "video", id: "k16-rook-v", topic: "Lucena and Philidor" }, P("k16-rook-p", "Rook endgames", "rookEndgame", 6, 4)] },
       { id: "k16-plans", title: "Plans from the opening", skill: "planning", goalTags: ["positional", "openings"], nodes: [{ kind: "plan", id: "k16-plan-c", plan: "carlsbad-minority" }, { kind: "video", id: "k16-plans-v", topic: "Minority attack" }, { kind: "plan", id: "k16-plan-f", plan: "french-chain" }] },
-      { id: "k16-def", title: "Defence", skill: "defense", goalTags: ["tactics", "tournament"], nodes: [P("k16-def-p", "Defensive moves", "defensiveMove"), { kind: "game", id: "k16-reti", game: "reti-tartakower" }] },
+      { id: "k16-def", title: "Defence", skill: "defense", goalTags: ["tactics", "tournament"], nodes: [{ kind: "lesson", id: "k16-def-l", lesson: "defence" }, P("k16-def-p", "Defensive moves", "defensiveMove"), { kind: "game", id: "k16-reti", game: "reti-tartakower" }] },
     ],
   },
   {
@@ -139,10 +160,10 @@ export const LEVELS: Level[] = [
       leaveWhen: "Pass the checkpoint: 6 of 8 puzzles around 1800 without help.",
     },
     units: [
-      { id: "k18-combo", title: "Longer combinations", skill: "calculation", goalTags: ["tactics"], nodes: [P("k18-long-p", "Long combinations", "long"), P("k18-sac-p", "Sacrifices", "sacrifice"), { kind: "game", id: "k18-immortal", game: "immortal" }] },
+      { id: "k18-combo", title: "Longer combinations", skill: "calculation", goalTags: ["tactics"], nodes: [{ kind: "lesson", id: "k18-combo-l", lesson: "sacrifices" }, P("k18-long-p", "Long combinations", "long"), P("k18-sac-p", "Sacrifices", "sacrifice"), { kind: "game", id: "k18-immortal", game: "immortal" }] },
       { id: "k18-pieces", title: "Good and bad pieces", skill: "evaluation", goalTags: ["positional"], nodes: [{ kind: "lesson", id: "k18-pieces-l", lesson: "good-bad-pieces" }, { kind: "video", id: "k18-pieces-v", topic: "Good and bad pieces" }, { kind: "plan", id: "k18-plan-sv", plan: "sveshnikov-outpost" }, { kind: "plan", id: "k18-plan-st", plan: "stonewall-bishops" }] },
       { id: "k18-attack", title: "Attacking the king", skill: "planning", goalTags: ["positional", "tactics"], nodes: [{ kind: "lesson", id: "k18-attack-l", lesson: "opposite-castling" }, { kind: "video", id: "k18-attack-v", topic: "Attacking the king" }, { kind: "plan", id: "k18-plan-oc", plan: "dragon-opposite-castling" }, P("k18-ks-p", "Kingside attacks", "kingsideAttack")] },
-      { id: "k18-convert", title: "Converting", skill: "endgameConversion", goalTags: ["endgame", "tournament"], nodes: [{ kind: "drill", id: "k18-conv-d", title: "Convert a winning position", drill: "conversion", need: 2 }] },
+      { id: "k18-convert", title: "Converting", skill: "endgameConversion", goalTags: ["endgame", "tournament"], nodes: [{ kind: "lesson", id: "k18-convert-l", lesson: "converting" }, { kind: "drill", id: "k18-conv-d", title: "Convert a winning position", drill: "conversion", need: 2 }] },
     ],
   },
   {
@@ -158,15 +179,15 @@ export const LEVELS: Level[] = [
       leaveWhen: "Pass the checkpoint: 6 of 8 puzzles around 2000 without help.",
     },
     units: [
-      { id: "k20-adv", title: "Advanced tactics", skill: "tactics", goalTags: ["tactics"], nodes: [P("k20-xray-p", "X-ray attacks", "xRayAttack", 6, 4), P("k20-inter-p", "Interference", "interference", 6, 4), P("k20-zug-p", "Zugzwang", "zugzwang", 6, 4)] },
+      { id: "k20-adv", title: "Advanced tactics", skill: "tactics", goalTags: ["tactics"], nodes: [{ kind: "lesson", id: "k20-adv-l", lesson: "zugzwang" }, P("k20-xray-p", "X-ray attacks", "xRayAttack", 6, 4), P("k20-inter-p", "Interference", "interference", 6, 4), P("k20-zug-p", "Zugzwang", "zugzwang", 6, 4)] },
       { id: "k20-calc", title: "Deep calculation", skill: "calculation", goalTags: ["tactics", "tournament"], nodes: [{ kind: "lesson", id: "k20-calc-l", lesson: "deep-calculation" }, P("k20-vlong-p", "Very long combinations", "veryLong"), { kind: "drill", id: "k20-calc-d", title: "Calculate whole lines", drill: "calculation", need: 5 }] },
-      { id: "k20-rep", title: "Repertoire in depth", skill: "openingKnowledge", goalTags: ["openings"], nodes: [{ kind: "opening", id: "k20-rep-w", slot: "white" }, { kind: "opening", id: "k20-rep-e4", slot: "vsE4" }, { kind: "opening", id: "k20-rep-d4", slot: "vsD4" }] },
+      { id: "k20-rep", title: "Repertoire in depth", skill: "openingKnowledge", goalTags: ["openings"], nodes: [{ kind: "lesson", id: "k20-rep-l", lesson: "repertoire-building" }, { kind: "opening", id: "k20-rep-w", slot: "white" }, { kind: "opening", id: "k20-rep-e4", slot: "vsE4" }, { kind: "opening", id: "k20-rep-d4", slot: "vsD4" }] },
       { id: "k20-tech", title: "Technique", skill: "endgameConversion", goalTags: ["endgame"], nodes: [{ kind: "drill", id: "k20-conv-d", title: "Convert a winning position", drill: "conversion", need: 3 }, { kind: "game", id: "k20-fischer", game: "game-of-the-century" }] },
     ],
   },
   {
     id: "to-2200",
-    title: "Road to 2200 and beyond",
+    title: "Road to 2200",
     from: 2000,
     to: 2200,
     guide: {
@@ -177,9 +198,47 @@ export const LEVELS: Level[] = [
       leaveWhen: "Pass the checkpoint: 6 of 8 puzzles around 2200 without help.",
     },
     units: [
-      { id: "k22-hard", title: "The hardest puzzles", skill: "tactics", goalTags: ["tactics"], nodes: [P("k22-hard-p", "Mixed hard puzzles", undefined, 10, 7), P("k22-def-p", "Hard defence", "defensiveMove")] },
+      { id: "k22-hard", title: "The hardest puzzles", skill: "tactics", goalTags: ["tactics"], nodes: [{ kind: "lesson", id: "k22-hard-l", lesson: "game-analysis" }, P("k22-hard-p", "Mixed hard puzzles", undefined, 10, 7), P("k22-def-p", "Hard defence", "defensiveMove")] },
       { id: "k22-rep", title: "Sharp openings", skill: "openingKnowledge", goalTags: ["openings"], nodes: [{ kind: "opening", id: "k22-rep-e4", slot: "vsE4" }, { kind: "opening", id: "k22-rep-d4", slot: "vsD4" }, { kind: "game", id: "k22-legall", game: "legall" }] },
+      { id: "k22-plan", title: "Prophylaxis", skill: "planning", goalTags: ["positional"], nodes: [{ kind: "lesson", id: "k22-plan-l", lesson: "prophylaxis" }, { kind: "plan", id: "k22-plan-st", plan: "stonewall-bishops" }, { kind: "video", id: "k22-plan-v", topic: "Good and bad pieces" }] },
       { id: "k22-calc", title: "Calculation at full depth", skill: "calculation", goalTags: ["tactics", "tournament"], nodes: [{ kind: "drill", id: "k22-calc-d", title: "Calculate whole lines", drill: "calculation", need: 6 }, { kind: "drill", id: "k22-blunder-d", title: "Blunder check", drill: "blunder", need: 6 }] },
+    ],
+  },
+  {
+    id: "to-2400",
+    title: "Road to 2400",
+    from: 2200,
+    to: 2400,
+    guide: {
+      summary: "Near master level, positions are decided by judgement as much as calculation: weighing imbalances, choosing the right exchanges, and using time well over a long game. Your openings must lead to middlegames you understand deeply.",
+      focus: ["Evaluating imbalances and choosing the right exchanges", "Bishop against knight and the bishop pair", "Time management in long games", "Hard defensive and quiet-move puzzles"],
+      habits: ["Before every exchange, ask which imbalance it changes", "Spend time at the critical moments, not on routine moves"],
+      mistakes: ["Trading into an ending that looks equal but is not", "Using too much time early and blundering in time trouble"],
+      leaveWhen: "Pass the checkpoint: 6 of 8 puzzles around 2400 without help.",
+    },
+    units: [
+      { id: "k24-imb", title: "Imbalances", skill: "evaluation", goalTags: ["positional"], nodes: [{ kind: "lesson", id: "k24-imb-l", lesson: "imbalances" }, { kind: "plan", id: "k24-imb-p", plan: "sveshnikov-outpost" }, { kind: "plan", id: "k24-imb-c", plan: "carlsbad-minority" }] },
+      { id: "k24-minor", title: "Minor pieces", skill: "evaluation", goalTags: ["positional", "endgame"], nodes: [{ kind: "lesson", id: "k24-minor-l", lesson: "bishops-knights" }, { kind: "video", id: "k24-minor-v", topic: "Good and bad pieces" }, P("k24-minor-p", "Endgame tactics", "endgame")] },
+      { id: "k24-time", title: "Practical play", skill: "time", goalTags: ["tournament"], nodes: [{ kind: "lesson", id: "k24-time-l", lesson: "time-management" }, { kind: "drill", id: "k24-blunder-d", title: "Blunder check", drill: "blunder", need: 6 }, P("k24-quiet-p", "Quiet moves", "quietMove")] },
+      { id: "k24-def", title: "Hard defence", skill: "defense", goalTags: ["tactics"], nodes: [P("k24-def-p", "Defensive moves", "defensiveMove"), { kind: "game", id: "k24-immortal", game: "immortal" }] },
+    ],
+  },
+  {
+    id: "to-2600",
+    title: "Road to 2600",
+    from: 2400,
+    to: 2600,
+    guide: {
+      summary: "At this level there are no shortcuts: the hardest combinations, deep preparation and dynamic judgement. Use the hardest puzzles, your own games and the engine as a sparring partner, and keep a journal of what you learn.",
+      focus: ["Dynamic play and the initiative", "The hardest combinations in every theme", "Sharp, deeply prepared openings", "Long calculation without a board"],
+      habits: ["Analyse every serious game before checking with the engine", "Look for the opponent's best idea before your own"],
+      mistakes: ["Choosing safe moves when the position demands action", "Stopping calculation before the position is quiet"],
+      leaveWhen: "Pass the checkpoint: 6 of 8 puzzles around 2600 without help.",
+    },
+    units: [
+      { id: "k26-dyn", title: "Initiative", skill: "planning", goalTags: ["positional", "tactics"], nodes: [{ kind: "lesson", id: "k26-dyn-l", lesson: "dynamic-play" }, P("k26-sac-p", "Sacrifices", "sacrifice"), { kind: "game", id: "k26-fischer", game: "game-of-the-century" }] },
+      { id: "k26-hard", title: "The hardest combinations", skill: "calculation", goalTags: ["tactics"], nodes: [P("k26-vlong-p", "Very long combinations", "veryLong"), P("k26-xray-p", "X-ray attacks", "xRayAttack", 6, 4), { kind: "drill", id: "k26-calc-d", title: "Calculate whole lines", drill: "calculation", need: 6 }] },
+      { id: "k26-rep", title: "Sharp preparation", skill: "openingKnowledge", goalTags: ["openings"], nodes: [{ kind: "opening", id: "k26-rep-w", slot: "white" }, { kind: "opening", id: "k26-rep-e4", slot: "vsE4" }, { kind: "opening", id: "k26-rep-d4", slot: "vsD4" }] },
     ],
   },
 ];

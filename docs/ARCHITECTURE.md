@@ -67,7 +67,7 @@ data. No language model is called, so there are no API costs and no invented var
 
 ## Status
 
-Working and tested: the journey (eight levels from Foundations to Road to 2200+, each with a guide, units of lessons, puzzles, videos, openings, endgames, plans, model games and drills, ordered by the learner's weakest skills and goal, steps unlocking in order, and a level test of 8 puzzles that must be passed to move up; all progress derived from recorded results); 14 journey lessons whose move answers are checked with Stockfish; onboarding; assessment (22 tasks across six skills, adaptive tactics);
+Working and tested: the journey (eleven levels from First steps to Road to 2600, each with a guide, units of lessons, puzzles, videos, openings, endgames, plans, model games and drills, ordered by the learner's weakest skills and goal, steps unlocking in order, and a level test of 8 puzzles that must be passed to move up; all progress derived from recorded results); 30 journey lessons whose move answers are checked with Stockfish (rules questions are checked for legality); onboarding; assessment (22 tasks across six skills, adaptive tactics);
 skill profile with ranges; daily and weekly plans with reasons; adaptive and themed puzzles
 with four-step hints; calculation mode with blindfold option; board-vision drills; 19 opening
 lessons with guided and from-memory drills, idea questions, repertoire and name lookup;

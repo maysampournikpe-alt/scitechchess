@@ -111,7 +111,7 @@ export function buildJourney(input: JourneyInput): Journey {
   const goalTag = GOAL_TAG[profile.goal];
 
   const levels: LevelState[] = LEVELS.map((level, index) => {
-    const units = [...level.units].sort((a, b) => {
+    const units = level.ordered ? level.units : [...level.units].sort((a, b) => {
       const fa = goalTag && a.goalTags.includes(goalTag) ? 0 : 1;
       const fb = goalTag && b.goalTags.includes(goalTag) ? 0 : 1;
       return fa - fb || (rank.get(a.skill) ?? 99) - (rank.get(b.skill) ?? 99);
